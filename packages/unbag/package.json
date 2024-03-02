@@ -1,0 +1,46 @@
+{
+  "name": "@vico/unbag",
+  "version": "0.0.1",
+  "description": "一个专门用来开发npm工具的包",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "LiuWenXing1996 lwx_redstone@163.com",
+  "keywords": [
+    "unbundle",
+    "bundleless",
+    "npm tool"
+  ],
+  "bin": {
+    "unbag": "bin/bin.js"
+  },
+  "scripts": {
+    "build": "tsx ./src/run.ts build"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "dependencies": {
+    "@typescript/vfs": "^1.5.0",
+    "bundle-require": "^4.0.2",
+    "chokidar": "^3.6.0",
+    "commander": "^10.0.0",
+    "concurrently": "^8.2.2",
+    "debounce-promise": "^3.1.2",
+    "esbuild": "^0.20.1",
+    "lodash": "^4.17.21",
+    "memfs": "^4.7.7",
+    "path-browserify": "^1.0.1",
+    "typescript": "~5.1.6",
+    "uuid": "^9.0.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/debounce-promise": "^3.1.9",
+    "@types/lodash": "^4.14.202",
+    "@types/path-browserify": "^1.0.2",
+    "@types/uuid": "^9.0.2",
+    "tsx": "^4.7.1"
+  }
+}

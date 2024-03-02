@@ -1,0 +1,19 @@
+{
+  "name": "vico",
+  "version": "0.0.1",
+  "description": "一个低代码平台辅助工具，方便创建更多的低代码平台",
+  "private": true,
+  "scripts": {
+    "build:unbag": "pnpm --filter '@vico/unbag' build",
+    "dev": "unbag parallel"
+  },
+  "license": "MIT",
+  "author": "LiuWenXing1996 lwx_redstone@163.com",
+  "devDependencies": {
+    "@types/wait-on": "^5.3.4",
+    "@vico/unbag": "workspace:^"
+  },
+  "dependencies": {
+    "wait-on": "^7.2.0"
+  }
+}

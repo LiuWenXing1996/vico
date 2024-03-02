@@ -1,0 +1,38 @@
+{
+  "name": "@vico/core",
+  "version": "0.0.1",
+  "description": "一个低代码平台辅助工具",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "LiuWenXing1996 lwx_redstone@163.com",
+  "keywords": [
+    "low-code"
+  ],
+  "scripts": {
+    "dev": "unbag watch",
+    "build": "unbag build"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "memfs": "^4.7.7",
+    "pascal-case": "^3.1.2",
+    "path-browserify": "^1.0.1",
+    "posthtml-parser": "^0.12.0",
+    "posthtml-render": "^3.0.0",
+    "tiny-emitter": "^2.1.0",
+    "uuid": "^9.0.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@pnpm/types": "^9.4.2",
+    "@types/lodash": "^4.14.202",
+    "@types/path-browserify": "^1.0.2",
+    "@vico/unbag": "workspace:^",
+    "utility-types": "^3.11.0"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@vico/cli",
+  "version": "0.0.1",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "LiuWenXing1996 lwx_redstone@163.com",
+  "keywords": [
+    "low-code"
+  ],
+  "scripts": {
+    "dev": "unbag watch",
+    "build": "unbag build"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "dependencies": {
+    "@vico/core": "workspace:^",
+    "vite": "^5.1.4"
+  },
+  "devDependencies": {
+    "@vico/unbag": "workspace:^"
+  }
+}

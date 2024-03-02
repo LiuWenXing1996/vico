@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noEmitOnError": false,
+    "verbatimModuleSyntax": true,
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
