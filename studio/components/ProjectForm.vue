@@ -7,7 +7,12 @@
             <NFormItem label="名称" path="name">
                 <n-input v-model:value="model.name" :disabled="Boolean(id)" />
             </NFormItem>
-            <NFormItem label="仓库地址" path="url">
+            <!-- <NFormItem label="仓库地址" path="url">
+                <n-input v-model:value="model.url" :disabled="Boolean(id)" />
+            </NFormItem> -->
+            <NFormItem label="模板地址" path="templateUrl">
+                <n-select v-model:value="value" filterable placeholder="搜索歌曲" :options="options" :loading="loading"
+                    clearable remote @search="handleSearch" />
                 <n-input v-model:value="model.url" :disabled="Boolean(id)" />
             </NFormItem>
             <NFormItem label="描述信息" path="description">
@@ -27,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type FormInst, NForm, NFormItem, NInput, useMessage, NSpace, NRow, NCol, NButton, type FormRules, type FormValidationError } from 'naive-ui'
+import { type FormInst, NForm, NSelect, NFormItem, NInput, useMessage, NSpace, NRow, NCol, NButton, type FormRules, type FormValidationError } from 'naive-ui'
 import type { IProject } from '~/server/models/project';
 import type { MaybePromise } from '~/types';
 const props = withDefaults(defineProps<{

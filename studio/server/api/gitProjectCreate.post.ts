@@ -11,8 +11,11 @@ import http from "isomorphic-git/http/web";
 import FS from "@isomorphic-git/lightning-fs";
 import { createFsUtils, createVfs, path } from "@vico/core";
 
-const token = "glpat-hiPdupZ2DVBUYJwmob71";
-const rootToken = "glpat-psSsnqupXyAeebvws5yp";
+// const token = "glpat-hiPdupZ2DVBUYJwmob71";
+// const rootToken = "glpat-psSsnqupXyAeebvws5yp";
+
+const token = "glpat-Cy6s3vafdZaZ5Aj5vzkD";
+const rootToken = "glpat-Cy6s3vafdZaZ5Aj5vzkD";
 
 export default defineEventHandler(async (event) => {
   const body = await useSafeValidatedBody(
@@ -33,69 +36,71 @@ export default defineEventHandler(async (event) => {
   }
   console.log("success");
   const api = new Gitlab({
-    host: "http://localhost:80",
+    host: "https://gitlab.com/",
     token,
   });
+  // const a = await api.Projects.all();
+  // console.log("a", a);
   const project = await api.Projects.create({
     name: body.data.name,
     path: body.data.path,
   });
   console.log("project",project)
 
-  const vfs = createVfs();
-  const fs = vfs.getFs();
-  // const fs = new FS("test");
-  const dir = "/temp";
-  const ref = "main";
-  await git.clone({
-    fs,
-    http,
-    dir,
-    url: "http://localhost:80/root/template.git",
-    ref,
-    singleBranch: true,
-    onAuth: () => {
-      return {
-        password: token,
-      };
-    },
-  });
-  console.log("listFiles");
-  // let files = await vfs.listFiles("/fddd");
-  let files = await git.listFiles({ fs, dir, ref });
-  const filesMap = await Promise.all(
-    files.map(async (f) => {
-      return await vfs.readFile(path.default.join(dir, f), "utf-8");
-    })
-  );
-  console.log("filesMap", filesMap);
-  // const sss = await git.add({fs,})
-  console.log("files", files);
-  await vfs.outputFile(`${dir}/sssss.txt`, "ddasssssda");
-  let filess = await git.listFiles({ fs, dir, ref });
-  console.log("filess", files);
-  await git.add({ fs, dir, filepath: "." });
-  await git.commit({
-    fs,
-    dir,
-    author: {
-      name: "root",
-      email: "mrtest@example.com",
-    },
-    message: "Added the a.txt file",
-  });
-  await git.push({
-    fs,
-    http,
-    dir,
-    url: "http://localhost:80/root/template.git",
-    ref,
-    onAuth: () => {
-      return {
-        password: rootToken,
-      };
-    },
-  });
+  // const vfs = createVfs();
+  // const fs = vfs.getFs();
+  // // const fs = new FS("test");
+  // const dir = "/temp";
+  // const ref = "main";
+  // await git.clone({
+  //   fs,
+  //   http,
+  //   dir,
+  //   url: "http://localhost:80/root/template.git",
+  //   ref,
+  //   singleBranch: true,
+  //   onAuth: () => {
+  //     return {
+  //       password: token,
+  //     };
+  //   },
+  // });
+  // console.log("listFiles");
+  // // let files = await vfs.listFiles("/fddd");
+  // let files = await git.listFiles({ fs, dir, ref });
+  // const filesMap = await Promise.all(
+  //   files.map(async (f) => {
+  //     return await vfs.readFile(path.default.join(dir, f), "utf-8");
+  //   })
+  // );
+  // console.log("filesMap", filesMap);
+  // // const sss = await git.add({fs,})
+  // console.log("files", files);
+  // await vfs.outputFile(`${dir}/sssss.txt`, "ddasssssda");
+  // let filess = await git.listFiles({ fs, dir, ref });
+  // console.log("filess", files);
+  // await git.add({ fs, dir, filepath: "." });
+  // await git.commit({
+  //   fs,
+  //   dir,
+  //   author: {
+  //     name: "root",
+  //     email: "mrtest@example.com",
+  //   },
+  //   message: "Added the a.txt file",
+  // });
+  // await git.push({
+  //   fs,
+  //   http,
+  //   dir,
+  //   url: "http://localhost:80/root/template.git",
+  //   ref,
+  //   onAuth: () => {
+  //     return {
+  //       password: rootToken,
+  //     };
+  //   },
+  // });
 
   // await api.Commits.create(aa.id, "main", "init by vico", [
   //   {

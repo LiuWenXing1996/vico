@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --inspect",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -16,17 +16,20 @@
     "@vicons/ionicons5": "^0.12.0",
     "h3-zod": "^0.5.3",
     "isomorphic-git": "^1.25.6",
+    "jszip": "^3.10.1",
     "monaco-editor": "^0.46.0",
-    "mongoose": "^8.2.0",
+    "mongoose": "^8.2.1",
     "naive-ui": "^2.38.1",
     "nuxt": "^3.10.3",
     "splitpanes": "^3.1.5",
-    "vue": "^3.4.19",
+    "uuid": "^9.0.0",
+    "vue": "^3.4.21",
     "vue-router": "^4.3.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/splitpanes": "^2.2.6",
+    "@types/uuid": "^9.0.2",
     "less": "^4.2.0",
     "nuxt-icons": "^3.2.1",
     "vite-plugin-node-polyfills": "^0.21.0"

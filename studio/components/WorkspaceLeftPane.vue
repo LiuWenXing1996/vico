@@ -6,9 +6,9 @@
                     :value="selectedKey" @select="handleMenuSelect" />
                 <NMenu :options="bottomMenuOptions" :collapsed="true" :collapsed-width="64" :collapsed-icon-size="22"
                     :value="selectedKey" @select="handleMenuSelect" :dropdown-props="{
-                        size: 'small',
-                        placement: 'top-end'
-                    }" />
+            size: 'small',
+            placement: 'top-end'
+        }" />
             </div>
         </NLayoutSider>
         <NMenu>
@@ -20,6 +20,7 @@
         </NMenu>
     </NLayout>
 </template>
+
 <script setup lang="ts">
 import { toRefs, provide, ref, h, computed } from 'vue';
 import type { Component } from "vue"
@@ -62,6 +63,9 @@ const bottomMenuOptions: IMenuOptionExtend[] = [
             onSelect: () => {
                 dialog.create({
                     showIcon: false,
+                    style: {
+                        width: "80vw"
+                    },
                     title: "项目列表",
                     content: () => {
                         return h(ProjectList)
@@ -93,6 +97,7 @@ const menuOptions: (MenuOption & {
 
     ]
 </script>
+
 <style lang="less" scoped>
 .menus-wrapper {
     display: flex;
