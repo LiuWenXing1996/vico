@@ -1,13 +1,10 @@
 <template>
     <div class="studio">
-        <Workspace :project-name="projectName" :branch-name="branchName" />
+        <Workspace :project-code="projectCode" :branch-id="branchId" />
     </div>
 </template>
 
 <script setup lang="ts">
-import * as vico from "@vico/core";
-console.log("vico-page", vico);
-
 const route = useRoute()
 const [] = route.params.slug
 const slug = arraify(route.params.slug).map(e => {
@@ -16,7 +13,7 @@ const slug = arraify(route.params.slug).map(e => {
     }
     return undefined
 })
-const [projectName, branchName] = slug
+const [projectCode, branchId] = slug
 definePageMeta({
     validate: (route) => {
         const slug = arraify(route.params.slug)

@@ -1,4 +1,3 @@
-import { Gitlab } from "@gitbeaker/rest";
 import { v4 as uuidv4 } from "uuid";
 
 export const arraify = <T>(target: T | T[]): T[] => {
@@ -15,13 +14,6 @@ export const filterNullable = <T>(
     }
     return !!e;
   }) as NonNullable<T>[];
-};
-
-export const getGitlabCilent = () => {
-  return new Gitlab({
-    host: "https://gitlab.com/",
-    token: "glpat-Cy6s3vafdZaZ5Aj5vzkD",
-  });
 };
 
 export const genProjectCode = () => {

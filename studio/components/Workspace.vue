@@ -3,6 +3,8 @@
         <div class="cook-studio">
             <Splitpanes>
                 <Pane class="left-pane" min-size="15" size="20">
+                    {{ projectCode }}
+                    {{ branchId }}
                     <WorkspaceLeftPane></WorkspaceLeftPane>
                 </Pane>
                 <Pane class="center-bottom-pane" min-size="15" size="60">
@@ -16,25 +18,50 @@
         </div>
     </n-config-provider>
 </template>
+
 <script setup lang="ts">
+import { createVfs } from "@vico/core";
+import JSZip from "jszip";
 import { NConfigProvider, zhCN, dateZhCN } from "naive-ui";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 import { provide, toRefs } from "vue";
 
 const props = defineProps({
-    projectName: {
+    projectCode: {
         type: String,
     },
-    branchName: {
+    branchId: {
         type: String,
     },
 });
-const { projectName, branchName } = toRefs(props);
-
-
-
+const { projectCode, branchId } = toRefs(props);
+const vfs = createVfs();
+watch([projectCode, branchId], async () => {
+    if (projectCode?.value && branchId?.value) {
+        console.log("project/files")
+        const { data } = await useFetch("/api/gitlab/project/files", {
+            params: {
+                projectId: projectCode?.value,
+                branchId: branchId?.value
+            },
+            responseType: "arrayBuffer",
+            retry: false,
+            watch: false,
+            deep: false
+        })
+        const zip = new JSZip();
+        const zipData = await zip.loadAsync(data.value as any);
+        const zipFiles = zipData.files
+        const files: {
+            path: string;
+            content: string;
+        }[] = []
+        console.log("zipFiles", zipFiles)
+    }
+}, { immediate: true })
 </script>
+
 <style lang="less">
 .cook-studio {
     height: 100%;

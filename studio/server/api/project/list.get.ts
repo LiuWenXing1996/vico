@@ -1,20 +1,22 @@
 import { useSafeValidatedQuery } from "h3-zod";
-import { ProjectModel } from "../models/project";
+import { ProjectModel } from "~/server/models/project";
 import zod from "zod";
 
 export default defineEventHandler(async (event) => {
   const query = await useSafeValidatedQuery(
     event,
     zod.object({
-      id: zod.string(),
+      key: zod.string().optional(),
     })
   );
   if (!query.success) {
     throw createError({
       statusCode: 400,
-      message: query.error.toString(),
+      statusMessage: JSON.stringify(query.error.errors),
     });
   }
-  const projectItem = await ProjectModel.findById(query.data.id);
-  return projectItem;
+  if(query.data.key){
+    return await ProjectModel.find().where("name").regex(query.data.key);
+  }
+  return await ProjectModel.find();
 });

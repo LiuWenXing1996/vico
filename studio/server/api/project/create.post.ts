@@ -1,8 +1,13 @@
 import { z } from "zod";
 import { CommitAction } from "@gitbeaker/rest";
-import { ProjectModel, ProjectUrType } from "~/server/models/project";
+import {
+  ProjectModel,
+  ProjectGitWebType,
+  IProject,
+} from "~/server/models/project";
 import JSZip from "jszip";
-import { filterNullable, genProjectCode, getGitlabCilent } from "~/utils";
+import { filterNullable, genProjectCode } from "~/utils";
+import { getGitlabCilent } from "~/server/utils";
 
 const projectCreateParamsScheam = z.object({
   name: z.string().min(1),
@@ -65,13 +70,14 @@ const handler = defineEventHandler(async (event) => {
     ...filterNullable(actions),
   ]);
 
-  const { web_url } = project;
-
-  const projectItem = await ProjectModel.create({
+  const projectItem = await ProjectModel.create<IProject>({
     name: body.name,
     code: body.code,
-    url: web_url,
-    urlType: ProjectUrType.GitLab,
+    git: {
+      url: project.web_url,
+      projectId: project.id,
+      webType: ProjectGitWebType.GitLab,
+    },
     description: body.description,
   });
   return await projectItem.save();

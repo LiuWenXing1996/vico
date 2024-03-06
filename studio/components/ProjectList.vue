@@ -13,7 +13,7 @@
 import { ProjectCreateForm } from "#components";
 import { NDataTable, type DataTableColumns, NButton, NSpace, useDialog, useMessage } from "naive-ui"
 import type { IProject } from "~/server/models/project";
-const { data, refresh: refreshList, pending: listLoading } = await useFetch<IProject[]>("/api/projectList")
+const { data, refresh: refreshList, pending: listLoading } = await useFetch<IProject[]>("/api/project/list")
 const dialog = useDialog()
 const message = useMessage()
 const clounms: DataTableColumns<IProject> = [
@@ -23,7 +23,7 @@ const clounms: DataTableColumns<IProject> = [
     },
     {
         title: 'git仓库地址',
-        key: 'url'
+        key: 'git.url'
     },
     {
         title: '操作',
@@ -47,7 +47,10 @@ const clounms: DataTableColumns<IProject> = [
                             strong: true,
                             tertiary: true,
                             size: 'small',
-                            onClick: () => { }
+                            onClick: async () => {
+                                // TODO：先用这两参数试试
+                                await navigateTo(`/studio/${row.git.projectId}/main`)
+                            }
                         },
                         { default: () => '打开' }
                     ),
