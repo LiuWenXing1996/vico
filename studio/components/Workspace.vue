@@ -3,8 +3,6 @@
         <div class="cook-studio">
             <Splitpanes>
                 <Pane class="left-pane" min-size="15" size="20">
-                    {{ projectCode }}
-                    {{ branchId }}
                     <WorkspaceLeftPane></WorkspaceLeftPane>
                 </Pane>
                 <Pane class="center-bottom-pane" min-size="15" size="60">
@@ -28,22 +26,22 @@ import "splitpanes/dist/splitpanes.css";
 import { provide, toRefs } from "vue";
 
 const props = defineProps({
-    projectCode: {
+    projectName: {
         type: String,
     },
-    branchId: {
+    branchName: {
         type: String,
     },
 });
-const { projectCode, branchId } = toRefs(props);
+const { projectName, branchName } = toRefs(props);
 const vfs = createVfs();
-watch([projectCode, branchId], async () => {
-    if (projectCode?.value && branchId?.value) {
+watch([projectName, branchName], async () => {
+    if (projectName?.value && branchName?.value) {
         console.log("project/files")
         const { data } = await useFetch("/api/gitlab/project/files", {
             params: {
-                projectId: projectCode?.value,
-                branchId: branchId?.value
+                projectId: projectName?.value,
+                branchName: branchName?.value
             },
             responseType: "arrayBuffer",
             retry: false,

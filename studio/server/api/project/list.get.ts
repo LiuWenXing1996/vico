@@ -1,22 +1,27 @@
 import { useSafeValidatedQuery } from "h3-zod";
-import { ProjectModel } from "~/server/models/project";
 import zod from "zod";
+import { getGitlabTopGroupId, getPrismaClient } from "~/server/utils";
+
 
 export default defineEventHandler(async (event) => {
-  const query = await useSafeValidatedQuery(
-    event,
-    zod.object({
-      key: zod.string().optional(),
-    })
-  );
-  if (!query.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: JSON.stringify(query.error.errors),
-    });
-  }
-  if(query.data.key){
-    return await ProjectModel.find().where("name").regex(query.data.key);
-  }
-  return await ProjectModel.find();
+  const userId = event.context.auth.user.id;
+  const data = await getValidatedQuery(event, (data) => {
+    return zod
+      .object({
+        key: zod.string().optional(),
+      })
+      .parse(data);
+  });
+  
+
+  const gitlabCilent = getGitlabCilent();
+  const groupId = getGitlabTopGroupId();
+  const projects = await gitlabCilent.Groups.allProjects(groupId, {
+    // @ts-ignore
+    maxPages: 1,
+    perPage: 10,
+    simple: true,
+    search: data.key,
+  });
+  return projects
 });

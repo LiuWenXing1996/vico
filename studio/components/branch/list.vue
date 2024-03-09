@@ -2,7 +2,6 @@
     <div class="project-list">
         <NSpace vertical>
             <NSpace>
-                <NButton @click="ddd">cehsi</NButton>
                 <n-button @click="handleCreateBtnClick">新增</n-button>
             </NSpace>
             <NDataTable :data="data || []" :columns="clounms" :loading="listLoading"></NDataTable>
@@ -17,6 +16,9 @@ import type { IProject } from "~/server/models/project";
 const { data, refresh: refreshList, pending: listLoading } = await useFetch<IProject[]>("/api/project/list")
 const dialog = useDialog()
 const message = useMessage()
+const props = defineProps<{
+    projectId: number
+}>()
 const clounms: DataTableColumns<IProject> = [
     {
         title: '名称',

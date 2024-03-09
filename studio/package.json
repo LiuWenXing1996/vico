@@ -12,7 +12,10 @@
   "dependencies": {
     "@gitbeaker/rest": "^39.34.3",
     "@isomorphic-git/lightning-fs": "^4.6.0",
+    "@prisma/client": "5.10.2",
+    "@sidebase/nuxt-auth": "^0.7.0",
     "@vico/core": "workspace:^",
+    "@vicons/antd": "^0.12.0",
     "@vicons/ionicons5": "^0.12.0",
     "h3-zod": "^0.5.3",
     "isomorphic-git": "^1.25.6",
@@ -21,6 +24,7 @@
     "mongoose": "^8.2.1",
     "naive-ui": "^2.38.1",
     "nuxt": "^3.10.3",
+    "prisma": "^5.10.2",
     "splitpanes": "^3.1.5",
     "uuid": "^9.0.0",
     "vue": "^3.4.21",
@@ -33,5 +37,8 @@
     "less": "^4.2.0",
     "nuxt-icons": "^3.2.1",
     "vite-plugin-node-polyfills": "^0.21.0"
+  },
+  "peerDependencies": {
+    "next-auth": "4.21.1"
   }
 }

@@ -6,17 +6,16 @@ import {
   IProject,
 } from "~/server/models/project";
 import JSZip from "jszip";
-import { filterNullable, genProjectCode } from "~/utils";
-import { getGitlabCilent } from "~/server/utils";
+import { filterNullable, genProjectName } from "~/utils";
+import { getGitlabCilent, getGitlabTopGroupId, getPrismaClient } from "~/server/utils";
+import { getZipFile } from "~/server/services/gitlab/project/getZipFile";
+import { commitByZipFile } from "~/server/services/gitlab/project/commitByZipFile";
+import { getToken } from "#auth";
 
 const projectCreateParamsScheam = z.object({
   name: z.string().min(1),
-  code: z.string().optional(),
   description: z.string().optional(),
-  gitProject: z.object({
-    templateId: z.union([z.string().min(1), z.number().positive()]),
-    name: z.string().min(1),
-  }),
+  templateId: z.number(),
 });
 
 export type IProjectCreateParams = z.infer<typeof projectCreateParamsScheam>;
@@ -25,61 +24,51 @@ const handler = defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, (body) => {
     return projectCreateParamsScheam.parse(body);
   });
-  const { gitProject } = body;
-  if (!body.code) {
-    body.code = genProjectCode();
-  }
-  const isExist = await ProjectModel.findOne({ code: body.code });
-  if (isExist) {
+  const prismaClient = getPrismaClient();
+  const isProjectExist = await prismaClient.project.findUnique({
+    where: {
+      name: body.name,
+    },
+  });
+  if (isProjectExist) {
     throw createError({
       statusCode: 400,
-      statusMessage: `${body.code} 已存在，请输入其他的code`,
+      statusMessage: `${body.name} 已存在，请输入其他的name`,
     });
   }
+  console.log("尝试创建gitProject。。。");
   const gitlabCilent = getGitlabCilent();
-  const templateProject = await gitlabCilent.Repositories.showArchive(
-    gitProject.templateId,
-    {
-      fileType: "zip",
-    }
-  );
-
-  const arrayBuffer = await templateProject.arrayBuffer();
-  const zipFile = await JSZip.loadAsync(arrayBuffer);
-  const actions: (CommitAction | undefined)[] = await Promise.all(
-    Object.keys(zipFile.files).map(async (file) => {
-      const zipd = zipFile.files[file];
-      if (!zipd.dir) {
-        const content = await zipd.async("base64");
-        const filePathSepList = file.split("/");
-        const [root, ...restFilePathSepList] = filePathSepList;
-        const newFilePath = restFilePathSepList.join("/");
-        return {
-          action: "create",
-          filePath: newFilePath,
-          content,
-          encoding: "base64",
-        };
-      }
-    })
-  );
-  const project = await gitlabCilent.Projects.create({
-    name: gitProject.name,
-  });
-  await gitlabCilent.Commits.create(project.id, "main", "init by template", [
-    ...filterNullable(actions),
-  ]);
-
-  const projectItem = await ProjectModel.create<IProject>({
+  const groupId = getGitlabTopGroupId()
+  const gitProject = await gitlabCilent.Projects.create({
     name: body.name,
-    code: body.code,
-    git: {
-      url: project.web_url,
-      projectId: project.id,
-      webType: ProjectGitWebType.GitLab,
-    },
-    description: body.description,
+    namespaceId: groupId,
   });
-  return await projectItem.save();
+  console.log("创建gitProject成功！！");
+  console.log("尝试获取模板。。。");
+  const templateZipFile = await getZipFile({
+    projectId: body.templateId,
+    sha: "main",
+  });
+  console.log("获取模板成功。。。");
+  console.log("尝试提交代码。。。");
+  await commitByZipFile({
+    projectId: gitProject.id,
+    branchName: "main",
+    message: "init by template",
+    zipFile: templateZipFile,
+  });
+  console.log("提交代码成功。。。");
+  const token = await getToken({ event });
+  if (!token) {
+  }
+  token?.sub;
+  console.log(token);
+  return await prismaClient.project.create({
+    data: {
+      name: body.name,
+      description: body.description,
+      authorId: 1,
+    },
+  });
 });
 export default handler;

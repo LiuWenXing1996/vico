@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 const route = useRoute()
+
 const [] = route.params.slug
 const slug = arraify(route.params.slug).map(e => {
     if (e) {

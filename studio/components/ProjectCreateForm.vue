@@ -5,23 +5,12 @@
             maxWidth: '640px'
         }">
             <NFormItem label="名称" path="name">
-                <NInput v-model:value="model.name" />
+                <NInput v-model:value="model.name" placeholder="请输入名称" />
             </NFormItem>
-            <NFormItem label="编码" path="code">
-                <NInput v-model:value="model.code" />
+            <NFormItem label="模板" path="templateId">
+                <NSelect v-model:value="model.templateId" filterable placeholder="搜索模板" :options="templateOptions"
+                    :loading="templateListLoading" clearable remote @search="(value) => gitTemplateSearchKey = value" />
             </NFormItem>
-            <NDivider title-placement="left">
-                git仓库配置
-            </NDivider>
-            <NFormItem label="模板地址" path="gitProject.templateId">
-                <NSelect v-model:value="model.gitProject.templateId" filterable placeholder="搜索模板"
-                    :options="templateOptions" :loading="templateListLoading" clearable remote
-                    @search="(value) => gitTemplateSearchKey = value" />
-            </NFormItem>
-            <NFormItem label="名称" path="gitProject.name">
-                <NInput v-model:value="model.gitProject.name" />
-            </NFormItem>
-            <NDivider />
             <NFormItem label="描述信息" path="description">
                 <NInput v-model:value="model.description" type="textarea" />
             </NFormItem>
@@ -50,13 +39,8 @@ const props = withDefaults(defineProps<{
 const { onSucess } = toRefs(props)
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
-const model = ref<IProjectCreateParams>({
+const model = ref<Partial<IProjectCreateParams>>({
     name: '',
-    code: '',
-    gitProject: {
-        name: '',
-        templateId: ''
-    }
 })
 const submitLoading = ref<boolean>(false)
 const gitTemplateSearchKey = ref<string | undefined>("vico")
@@ -81,21 +65,12 @@ const rules: FormRules = {
             message: "请输入名称",
         }
     ],
-    gitProject: {
-        templateId: [
-            {
-                required: true,
-                message: "请选择仓库模板",
-            }
-        ],
-        name: [
-            {
-                required: true,
-                message: "请设置仓库名称",
-            }
-        ]
-    }
-
+    templateId: [
+        {
+            required: true,
+            message: "请选择仓库模板",
+        }
+    ],
 }
 
 const submit = async () => {
