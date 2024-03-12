@@ -4,6 +4,7 @@ declare module "#app" {
   interface PageMeta {
     icon?: () => VNodeChild;
     order?: number;
+    disableAuth?: boolean;
   }
 }
 

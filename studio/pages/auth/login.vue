@@ -60,10 +60,7 @@
     </n-card>
 </template>
 <script setup lang="ts">
-import { useRouter } from "vue-router"
 import { type FormItemRule, NCard, NSpace, NSwitch, NIcon, NH1, NText, NForm, NFormItem, NInput, NInputGroup, NButton, type FormRules, type FormInst, type FormValidationError, useMessage } from "naive-ui"
-
-const { signIn } = useAuth()
 
 const darkTheme = ref(false)
 const isLogin = ref(true)
@@ -111,23 +108,35 @@ const handleLogin = async () => {
         return
     }
     try {
-        const res = await signIn('gitlab', { username: model.value.name, password: model.value.password, redirect: false })
-        const error = (res as any).error
-        if (error) {
-            throw error
+        if (isLogin.value) {
+            await $fetch("/api/auth/login", {
+                method: "post",
+                body: {
+                    name: model.value.name,
+                    password: model.value.password
+                }
+            })
+        } else {
+            await $fetch("/api/auth/register", {
+                method: "post",
+                body: {
+                    name: model.value.name,
+                    password: model.value.password,
+                    email: model.value.email
+                }
+            })
         }
+
     } catch (error: any) {
-        if (error) {
-            message.error(error?.data?.message || "登录失败，请检查输入的用户名和密码");
-            return
-        }
+        message.error(error?.data?.message || `${isLogin ? "登录" : "注册"}失败，请检查输入的用户名和密码`);
+        return
     }
 
-    message.success("登录成功")
+    message.success(`${isLogin ? "登录" : "注册"}成功`)
     const redirectUrl = (Array.isArray(route.query.callbackUrl) ? route.query.callbackUrl[0] : route.query.callbackUrl) || "/"
     navigateTo(redirectUrl, { external: true })
 }
-definePageMeta({ auth: false })
+definePageMeta({ disableAuth: true })
 
 </script>
 <style lang="less">

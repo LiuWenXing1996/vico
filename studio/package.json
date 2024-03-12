@@ -10,16 +10,23 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@auth/core": "^0.28.0",
     "@gitbeaker/rest": "^39.34.3",
+    "@hebilicious/authjs-nuxt": "^0.3.5",
     "@isomorphic-git/lightning-fs": "^4.6.0",
     "@prisma/client": "5.10.2",
     "@sidebase/nuxt-auth": "^0.7.0",
     "@vico/core": "workspace:^",
     "@vicons/antd": "^0.12.0",
     "@vicons/ionicons5": "^0.12.0",
+    "cross-fetch": "^4.0.0",
+    "defu": "^6.1.4",
+    "gitea-js": "^1.20.1",
     "h3-zod": "^0.5.3",
     "isomorphic-git": "^1.25.6",
+    "jsonwebtoken": "^9.0.2",
     "jszip": "^3.10.1",
+    "md5": "^2.3.0",
     "monaco-editor": "^0.46.0",
     "mongoose": "^8.2.1",
     "naive-ui": "^2.38.1",
@@ -32,6 +39,8 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/md5": "^2.3.5",
     "@types/splitpanes": "^2.2.6",
     "@types/uuid": "^9.0.2",
     "less": "^4.2.0",

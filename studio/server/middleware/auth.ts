@@ -1,13 +1,12 @@
-import { getServerSession, getToken } from "#auth";
 export default eventHandler(async (event) => {
   if (!event.path.startsWith("/api/auth")) {
-    const token = await getToken({ event });
-    if (!token) {
+    const payload = jwtVerify(event);
+    if (!payload) {
       throw createError({ statusMessage: "Unauthenticated", statusCode: 403 });
     }
     event.context.auth = {
       user: {
-        id: Number(token.id),
+        id: Number(payload.id),
       },
     };
   }

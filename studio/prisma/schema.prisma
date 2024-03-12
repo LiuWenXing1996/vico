@@ -8,9 +8,20 @@ datasource db {
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  email       String  @unique
-  name        String  @unique
-  password    String
-  gitlabToken String?
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  name             String            @unique
+  password         String
+  userSecretConfig UserSecretConfig?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model UserSecretConfig {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int      @unique
+  giteaToken String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

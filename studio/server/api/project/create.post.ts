@@ -10,7 +10,6 @@ import { filterNullable, genProjectName } from "~/utils";
 import { getGitlabCilent, getGitlabTopGroupId, getPrismaClient } from "~/server/utils";
 import { getZipFile } from "~/server/services/gitlab/project/getZipFile";
 import { commitByZipFile } from "~/server/services/gitlab/project/commitByZipFile";
-import { getToken } from "#auth";
 
 const projectCreateParamsScheam = z.object({
   name: z.string().min(1),

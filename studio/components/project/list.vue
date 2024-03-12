@@ -2,7 +2,7 @@
     <div class="project-list">
         <NSpace vertical>
             <NSpace>
-                <NButton @click="ddd">cehsi</NButton>
+                <ProjectListSerach v-model="searchValue" :handleSearch="handleSearch"></ProjectListSerach>
                 <n-button @click="handleCreateBtnClick">新增</n-button>
             </NSpace>
             <NDataTable :data="data || []" :columns="clounms" :loading="listLoading"></NDataTable>
@@ -12,9 +12,24 @@
 
 <script setup lang="ts">
 import { ProjectCreateForm } from "#components";
-import { NDataTable, type DataTableColumns, NButton, NSpace, useDialog, useMessage } from "naive-ui"
+import { NDataTable, type DataTableColumns, NButton, NSpace, useDialog, useMessage, NForm, NFormItem, NInput, type FormInst } from "naive-ui"
 import type { IProject } from "~/server/models/project";
-const { data, refresh: refreshList, pending: listLoading } = await useFetch<IProject[]>("/api/project/list")
+import type { ISearchValue } from "./list/serach.vue";
+
+const searchValue = ref<ISearchValue>({ name: "vico" })
+
+const { data, refresh: refreshList, pending: listLoading } = await useCustomFetch("/api/project/list", {
+    params: {
+        key: searchValue.value.name
+    },
+    immediate: false
+})
+const handleSearch = () => {
+    refreshList()
+}
+onMounted(() => {
+    refreshList()
+})
 const dialog = useDialog()
 const message = useMessage()
 const clounms: DataTableColumns<IProject> = [
@@ -90,16 +105,6 @@ const clounms: DataTableColumns<IProject> = [
         }
     }
 ]
-
-const ddd = async () => {
-    const a = await $fetch("/api/gitlab/project/archive", {
-        method: "post",
-        body: {
-            projectId: "55565308",
-            branchId: "main"
-        }
-    })
-}
 
 const delProject = async (code: string) => {
     try {

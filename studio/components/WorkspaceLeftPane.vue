@@ -32,7 +32,7 @@ import {
     PlayOutline,
     GridOutline
 } from '@vicons/ionicons5'
-import { NuxtIcon, ProjectList } from '#components'
+import { NuxtIcon, ProjectList, UserSettingForm } from '#components'
 
 const dialog = useDialog()
 const selectedKey = ref('resource-manager')
@@ -56,23 +56,66 @@ const bottomMenuOptions: IMenuOptionExtend[] = [
         label: '用户',
         key: 'user',
         icon: renderIcon(h(NuxtIcon, { name: "user" })),
-        children: [{
-            label: '项目列表',
-            key: 'project',
-            icon: renderIcon(h(NuxtIcon, { name: "project" })),
-            onSelect: () => {
-                dialog.create({
-                    showIcon: false,
-                    style: {
-                        width: "80vw"
-                    },
-                    title: "项目列表",
-                    content: () => {
-                        return h(ProjectList)
-                    }
-                })
+        children: [
+            {
+                label: '项目列表',
+                key: 'project',
+                icon: renderIcon(h(NuxtIcon, { name: "project" })),
+                onSelect: () => {
+                    dialog.create({
+                        showIcon: false,
+                        style: {
+                            width: "80vw"
+                        },
+                        title: "项目列表",
+                        content: () => {
+                            return h(ProjectList)
+                        }
+                    })
+                },
             },
-        }]
+            {
+                label: '个人设置',
+                key: 'userSetting',
+                icon: renderIcon(h(NuxtIcon, { name: "project" })),
+                onSelect: () => {
+                    dialog.create({
+                        showIcon: false,
+                        style: {
+                           maxWidth:"200vw"
+                        },
+                        title: "个人设置",
+                        content: () => {
+                            return h(UserSettingForm)
+                        }
+                    })
+                },
+            },
+            {
+                label: '退出登录',
+                key: 'logout',
+                icon: renderIcon(h(NuxtIcon, { name: "project" })),
+                onSelect: () => {
+                    dialog.warning({
+                        title: '退出登录',
+                        content: '确定退出登录吗？',
+                        positiveText: '确定',
+                        negativeText: '不确定',
+                        onPositiveClick: async () => {
+                            await $fetch("/api/auth/logout");
+                            await navigateTo(`/studio`, {
+                                open: {
+                                    target: "_self"
+                                }
+                            })
+                        },
+                        onNegativeClick: () => {
+                        }
+                    })
+
+                },
+            }
+        ]
     },
 ]
 
