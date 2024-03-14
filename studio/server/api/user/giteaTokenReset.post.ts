@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { resolveCurrentUserFromEvent } from "~/server/utils";
 
 const paramsScheam = z.object({
-  gitlabToken: z.string().min(1),
+  giteaToken: z.string().min(1),
 });
 
 export type IParams = z.infer<typeof paramsScheam>;
@@ -12,17 +11,24 @@ const handler = defineEventHandler(async (event) => {
     return paramsScheam.parse(data);
   });
   const currentUser = await resolveCurrentUserFromEvent(event);
+  if (currentUser) {
+    const prismaClient = getPrismaClient();
+    await prismaClient.userSecretConfig.upsert({
+      where: {
+        id: currentUser.id,
+      },
+      update: {
+        giteaToken: data.giteaToken,
+      },
+      create: {
+        userId: currentUser.id,
+        giteaToken: data.giteaToken,
+      },
+    });
+    return true;
+  }
 
-  const prismaClient = getPrismaClient();
-  const user = await prismaClient.user.update({
-    where: {
-      id: currentUser.id,
-    },
-    data: {
-      gitlabToken: data.gitlabToken,
-    },
-  });
-  return true;
+  return false;
 });
 
 export default handler;

@@ -1,18 +1,18 @@
 <template>
     <NSpace vertical>
-        <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" label-width="auto"
+        <NForm ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="auto"
             require-mark-placement="right-hanging" :style="{
             maxWidth: '640px'
         }">
             <NFormItem label="名称" path="name">
-                <NInput v-model:value="model.name" placeholder="请输入名称" />
+                <NInput v-model:value="formValue.name" placeholder="请输入名称" />
             </NFormItem>
-            <NFormItem label="模板" path="templateId">
-                <NSelect v-model:value="model.templateId" filterable placeholder="搜索模板" :options="templateOptions"
+            <NFormItem label="模板" path="templatePath">
+                <NSelect v-model:value="formValue.templatePath" filterable placeholder="搜索模板" :options="templateOptions"
                     :loading="templateListLoading" clearable remote @search="(value) => gitTemplateSearchKey = value" />
             </NFormItem>
             <NFormItem label="描述信息" path="description">
-                <NInput v-model:value="model.description" type="textarea" />
+                <NInput v-model:value="formValue.description" type="textarea" />
             </NFormItem>
         </NForm>
         <NRow :gutter="[0, 24]">
@@ -39,6 +39,26 @@ const props = withDefaults(defineProps<{
 const { onSucess } = toRefs(props)
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
+export type IFormValue = Omit<IParams, "templateOwner" | "templateRepo"> & {
+    templatePath: string
+}
+const genTemplatePath = (templateOwner: string, templateRepo: string) => {
+    return JSON.stringify({ templateOwner, templateRepo })
+}
+const parseTemplatePath = (path: string) => {
+    let value = undefined;
+    try {
+        value = JSON.parse(path)
+    } catch (error) {
+
+    }
+    return value as { templateOwner?: string, templateRepo?: string } | undefined
+}
+const formValue = ref<IFormValue>({
+    name: '',
+    description: '',
+    templatePath: ''
+})
 const model = ref<Partial<IParams>>({
     name: '',
 })

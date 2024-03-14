@@ -1,20 +1,24 @@
 import { z } from "zod";
-import { ProjectModel } from "~/server/models/project";
 
-const projectDeleteParamsScheam = z.object({
-  code: z.string().min(1),
+const paramsScheam = z.object({
+  owner: z.string().min(1),
+  repo: z.string().min(1),
 });
 
-export type IProjectDeleteParams = z.infer<typeof projectDeleteParamsScheam>;
-export type IProjectDeleteReturn = Awaited<ReturnType<typeof handler>>;
+export type IParams = z.infer<typeof paramsScheam>;
+export type IReturn = Awaited<ReturnType<typeof handler>>;
 const handler = defineEventHandler(async (event) => {
-  const body = await readValidatedBody(event, (body) => {
-    return projectDeleteParamsScheam.parse(body);
+  const data = await readValidatedBody(event, (data) => {
+    return paramsScheam.parse(data);
   });
+  const userSecretConfig = await resolveUserSecretConfigFromEvent(event);
+  if (userSecretConfig?.giteaToken) {
+    const giteaClient = getGiteaClient(userSecretConfig?.giteaToken);
+    await giteaClient.repos.repoDelete(data.owner, data.repo);
+    return true;
+  }
 
-  return await ProjectModel.deleteMany({
-    code: body.code,
-  });
+  return false;
 });
 
 export default handler;

@@ -2,8 +2,8 @@
     <NSpace vertical>
         <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" label-width="auto"
             require-mark-placement="right-hanging">
-            <NFormItem label="gitlabToken" path="gitlabToken">
-                <NInput v-model:value="model.gitlabToken" placeholder="请输入gitlabToken" />
+            <NFormItem label="token" path="giteaToken">
+                <NInput v-model:value="model.giteaToken" placeholder="请输入giteaToken" />
             </NFormItem>
         </NForm>
         <NRow :gutter="[0, 24]">
@@ -20,7 +20,7 @@
 
 <script lang="ts" setup>
 import { type FormInst, NForm, NFormItem, NInput, useMessage, NSpace, NRow, NCol, NButton, type FormRules, type FormValidationError, useDialog } from 'naive-ui'
-import type { IParams } from '~/server/api/user/gitlabTokenReset.post';
+import type { IParams } from '~/server/api/user/giteaTokenReset.post';
 
 import type { MaybePromise } from '~/types';
 const props = defineProps<{
@@ -30,15 +30,15 @@ const { onSucess } = toRefs(props)
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
 const model = ref<Partial<IParams>>({
-    gitlabToken: ""
+    giteaToken: ""
 })
 const submitLoading = ref<boolean>(false)
 
 const rules: FormRules = {
-    gitlabToken: [
+    giteaToken: [
         {
             required: true,
-            message: "请输入gitlabToken",
+            message: "请输入giteaToken",
         }
     ]
 }
@@ -58,7 +58,7 @@ const submit = async () => {
         return
     }
     try {
-        await $fetch("/api/user/gitlabTokenReset", {
+        await $fetch("/api/user/giteaTokenReset", {
             method: "post",
             body: {
                 ...model.value

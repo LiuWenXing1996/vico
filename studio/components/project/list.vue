@@ -13,10 +13,11 @@
 <script setup lang="ts">
 import { ProjectCreateForm } from "#components";
 import { NDataTable, type DataTableColumns, NButton, NSpace, useDialog, useMessage, NForm, NFormItem, NInput, type FormInst } from "naive-ui"
-import type { IProject } from "~/server/models/project";
 import type { ISearchValue } from "./list/serach.vue";
+import type { IReturn } from "~/server/api/project/list.get"
+type IProject = NonNullable<IReturn>[0]
 
-const searchValue = ref<ISearchValue>({ name: "vico" })
+const searchValue = ref<ISearchValue>({ name: "" })
 
 const { data, refresh: refreshList, pending: listLoading } = await useCustomFetch("/api/project/list", {
     params: {
@@ -36,10 +37,6 @@ const clounms: DataTableColumns<IProject> = [
     {
         title: '名称',
         key: 'name'
-    },
-    {
-        title: 'git仓库地址',
-        key: 'git.url'
     },
     {
         title: '操作',
@@ -88,7 +85,7 @@ const clounms: DataTableColumns<IProject> = [
                                     negativeText: '不确定',
                                     onPositiveClick: async () => {
                                         d.loading = true;
-                                        const delSucess = await delProject(row.code)
+                                        const delSucess = await delProject(row.owner?.login, row.name)
                                         d.loading = false;
                                         if (delSucess) {
                                             refreshList()
@@ -106,14 +103,18 @@ const clounms: DataTableColumns<IProject> = [
     }
 ]
 
-const delProject = async (code: string) => {
+const delProject = async (owner: string, repo: string) => {
     try {
-        await $fetch("/api/project/delete", {
+        const res = await useCustomFetch("/api/project/delete", {
             method: "post",
             body: {
-                code
-            }
+                owner, repo
+            },
+            watch: false
         })
+        if (!res.data.value) {
+            throw new Error()
+        }
     } catch (error: any) {
         if (error) {
             message.error(error?.data?.message || "删除失败");

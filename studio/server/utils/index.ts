@@ -52,22 +52,3 @@ export const getJwtTokenSecret = () => {
   }
   return secret;
 };
-
-export const resolveCurrentUserFromEvent = async (
-  event: H3Event<EventHandlerRequest>
-) => {
-  const userId = event.context.auth.user.id;
-  const prismaClient = getPrismaClient();
-  const user = await prismaClient.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-  if (!user) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "undefined user",
-    });
-  }
-  return user;
-};

@@ -22,16 +22,13 @@ const getGiteaBaseUrl = () => {
   return baseUrl;
 };
 
-export const getGiteaClient = (token?: string | null) => {
-  if (!token) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "undefined GITEA_TOKEN",
-    });
-  }
+export const getGiteaClient = (token: string) => {
   return giteaApi(getGiteaBaseUrl(), {
     token: token,
-    customFetch: fetch,
+    customFetch: async (...rest) => {
+      const a = await fetch(...rest);
+      return a;
+    },
   });
 };
 
