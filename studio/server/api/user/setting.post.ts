@@ -12,7 +12,7 @@ const handler = defineEventHandler(async (event) => {
   });
   const currentUser = await resolveCurrentUserFromEvent(event);
   if (currentUser) {
-    const prismaClient = getPrismaClient();
+    const prismaClient = usePrismaClient();
     const user = await prismaClient.user.update({
       where: {
         id: currentUser.id,

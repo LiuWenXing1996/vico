@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { cryptoPassword } from "~/server/utils";
 
 const paramsScheam = z.object({
   name: z.string().min(1),
@@ -14,7 +13,7 @@ export default defineEventHandler(async (event) => {
     return paramsScheam.parse(body);
   });
 
-  const prismaClient = getPrismaClient();
+  const prismaClient = usePrismaClient();
   const user = await prismaClient.user.create({
     data: {
       name: body.name,

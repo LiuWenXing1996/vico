@@ -1,18 +1,18 @@
 import type { UseFetchOptions } from "#app";
 import { defu } from "defu";
-
-export interface IApiMap {
-  "/api/project/list": {
-    method: "get";
-    requestData: import("~/server/api/project/list.get").IParams;
-    responseData: import("~/server/api/project/list.get").IReturn;
-  };
-  "/api/project/delete": {
-    method: "post";
-    requestData: import("~/server/api/project/delete.post").IParams;
-    responseData: import("~/server/api/project/delete.post").IReturn;
-  };
-}
+import {type IApiMap } from "#typed-fecth";
+// export interface IApiMap {
+//   "/api/project/list": {
+//     method: "get";
+//     requestData: import("~/server/api/project/list.get").IParams;
+//     responseData: import("~/server/api/project/list.get").IReturn;
+//   };
+//   "/api/project/delete": {
+//     method: "post";
+//     requestData: import("~/server/api/project/delete.post").IParams;
+//     responseData: import("~/server/api/project/delete.post").IReturn;
+//   };
+// }
 
 export type IFe<
   key extends keyof IApiMap,

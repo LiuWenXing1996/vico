@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { getGiteaClient } from "~/server/utils/giteaClient";
+import { useGithubClient } from "~/server/utils/github-client";
 import { resolveUserSecretConfigFromEvent } from "~/server/utils/user";
 
-// TODO：分页变成公共的接口
 export const paramsScheam = z.object({
   key: z.string().optional(),
   page: z.number().min(1),
@@ -11,26 +11,19 @@ export const paramsScheam = z.object({
 export type IParams = z.infer<typeof paramsScheam>;
 export type IReturn = Awaited<ReturnType<typeof handler>>;
 const handler = defineEventHandler(async (event) => {
+  const ddd =getQuery(event)
+  console.log(ddd)
   const data = await getValidatedQuery(event, (data) => {
     return paramsScheam.parse(data);
   });
-  const userSecretConfig = await resolveUserSecretConfigFromEvent(event);
-  if (userSecretConfig?.giteaToken) {
-    const giteaClient = getGiteaClient(userSecretConfig?.giteaToken);
-    const repo = await giteaClient.repos.repoSearch({
-      q: data.key,
-      template: false,
-      limit: data.limit,
-      page: data.page,
-    });
-    const total = Number(repo.headers.get("x-total-count")) || 0;
-    return {
-      data: repo.data.data,
-      total,
-    };
-  }
+  const githubClient = await useGithubClient(event);
+  const res = await githubClient.repoList({
+    page: data.page,
+    limit: data.limit,
+  });
+
   return {
-    data: [],
+    data: res,
     total: 0,
   };
 });

@@ -1,7 +1,6 @@
 import { Gitlab } from "@gitbeaker/rest";
 import { PrismaClient } from "@prisma/client";
 import md5 from "md5";
-import type { H3Event, EventHandlerRequest } from "h3";
 
 let prismaClient: PrismaClient | null = null;
 
@@ -18,7 +17,7 @@ export const getGitlabCilent = (token?: string | null) => {
   });
 };
 
-export const getPrismaClient = () => {
+export const usePrismaClient = () => {
   if (prismaClient) {
     return prismaClient;
   }

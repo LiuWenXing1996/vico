@@ -32,7 +32,7 @@ import {
     PlayOutline,
     GridOutline
 } from '@vicons/ionicons5'
-import { NuxtIcon, ProjectList, UserSettingForm } from '#components'
+import { NuxtIcon, ProjectList, UserSetting } from '#components'
 
 const dialog = useDialog()
 const selectedKey = ref('resource-manager')
@@ -86,7 +86,7 @@ const bottomMenuOptions: IMenuOptionExtend[] = [
                         },
                         title: "个人设置",
                         content: () => {
-                            return h(UserSettingForm)
+                            return h(UserSetting)
                         }
                     })
                 },
