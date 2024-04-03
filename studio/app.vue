@@ -1,17 +1,27 @@
 <template>
   <div id="app">
-    <NMessageProvider>
-      <NDialogProvider>
-        <NuxtLayout>
-          <NuxtPage />
-        </NuxtLayout>
-      </NDialogProvider>
-    </NMessageProvider>
+    <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
+      <n-message-provider>
+        <n-dialog-provider>
+          <nuxt-layout>
+            <nuxt-page />
+          </nuxt-layout>
+        </n-dialog-provider>
+      </n-message-provider>
+    </n-config-provider>
   </div>
 </template>
 
 <script setup lang="ts">
-import { NMessageProvider, NDialogProvider } from "naive-ui"
+import {
+  NMessageProvider,
+  NDialogProvider,
+  NConfigProvider,
+  zhCN,
+  dateZhCN,
+} from "naive-ui";
+const { fetch } = useUserSession();
+await fetch();
 </script>
 
 <style lang="less" scoped>

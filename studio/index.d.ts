@@ -1,4 +1,6 @@
 import type { VNodeChild } from "vue";
+import type { Endpoints } from "@octokit/types";
+import type { string } from "zod";
 
 declare module "#app" {
   interface PageMeta {
@@ -11,6 +13,15 @@ declare module "#app" {
 declare module "next-auth" {
   interface Session {
     uid?: string;
+  }
+}
+
+declare module "#auth-utils" {
+  type GithubUser = Endpoints["GET /user"]["response"]["data"];
+  interface User {
+    login: GithubUser["login"];
+    avatar_url: GithubUser["avatar_url"];
+    id: GithubUser["id"];
   }
 }
 

@@ -1,10 +1,8 @@
-import { Octokit } from "@octokit/core";
-import type { Endpoints } from "@octokit/types";
 import { z } from "zod";
-import { getGiteaClient } from "~/server/utils/giteaClient";
-import { resolveUserSecretConfigFromEvent } from "~/server/utils/user";
 
 export const paramsScheam = z.object({
+  owner: z.string().min(1),
+  repo: z.string().min(1),
   key: z.string().optional(),
   page: z.coerce.number().min(1),
   limit: z.coerce.number().min(1),
@@ -15,16 +13,14 @@ const handler = defineEventHandler(async (event) => {
   const data = await getValidatedQuery(event, (data) => {
     return paramsScheam.parse(data);
   });
-  const githubTokenSession = await getGithubTokenSession(event);
-  const githubClient = new GithubClient({ token: githubTokenSession.content });
-  const res = await githubClient.listCurrentUserRepo({
+  const githubClient = await useGithubClient(event);
+  const res = await githubClient.branchList({
     page: data.page,
     limit: data.limit,
     key: data.key,
+    owner: data.owner,
+    repo: data.repo,
   });
-  // return {
-  //   s: "s",
-  // };
   return res;
 });
 

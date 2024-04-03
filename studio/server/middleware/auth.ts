@@ -1,5 +1,3 @@
-import { getServerSession } from "#auth";
-
 export default eventHandler(async (event) => {
   if (event.path.startsWith("/api/auth")) {
     return;
@@ -9,11 +7,11 @@ export default eventHandler(async (event) => {
     return;
   }
 
-  const session = await getServerSession(event);
-  if (!session || !Number(session.uid)) {
-    throw createError({ statusMessage: "Unauthenticated", statusCode: 403 });
+  const session = await getUserSession(event);
+  if (!session.user) {
+    // throw createError({ statusMessage: "Unauthenticated", statusCode: 403 });
   }
-  event.context.user = {
-    id: Number(session.uid),
-  };
+  // event.context.user = {
+  //   id: Number(session.uid),
+  // };
 });

@@ -1,6 +1,8 @@
 import { Gitlab } from "@gitbeaker/rest";
 import { PrismaClient } from "@prisma/client";
 import md5 from "md5";
+import type { H3Event } from "h3";
+import { defu } from "defu";
 
 let prismaClient: PrismaClient | null = null;
 
@@ -50,4 +52,14 @@ export const getJwtTokenSecret = () => {
     });
   }
   return secret;
+};
+
+export const useGithubTokenSession = async (event: H3Event) => {
+  const sessionConfig = defu(
+    { password: process.env.NUXT_SESSION_PASSWORD },
+    useRuntimeConfig(event).session
+  ) as any;
+  return useSession<{
+    value: string;
+  }>(event, sessionConfig);
 };

@@ -9,7 +9,7 @@
         <n-button @click="handleCreateBtnClick">新增</n-button>
       </NSpace>
       <NDataTable
-        :data="data || []"
+        :data="data?.items || []"
         :columns="clounms"
         :loading="listLoading"
       ></NDataTable>
@@ -33,15 +33,13 @@ import {
 } from "naive-ui";
 import type { ISearchValue } from "./list/serach.vue";
 import type { IReturn } from "~/server/api/project/list.get";
-type IProject = NonNullable<IReturn>[0];
-
+type IProject = IReturn["items"][0];
 const searchValue = ref<ISearchValue>({ name: "" });
-
 const {
   data,
   refresh: refreshList,
   pending: listLoading,
-} = await useTypedFetch("/api/project/list", {
+} = await useFetch("/api/project/list", {
   params: {
     key: searchValue.value.name,
     page: 1,
@@ -49,6 +47,7 @@ const {
   },
   immediate: false,
 });
+const a = data?.value;
 const handleSearch = () => {
   refreshList();
 };
@@ -61,6 +60,10 @@ const clounms: DataTableColumns<IProject> = [
   {
     title: "名称",
     key: "name",
+  },
+  {
+    title: "名称",
+    key: "",
   },
   {
     title: "操作",
@@ -77,16 +80,6 @@ const clounms: DataTableColumns<IProject> = [
                 strong: true,
                 tertiary: true,
                 size: "small",
-                onClick: () => {},
-              },
-              { default: () => "编辑" }
-            ),
-            h(
-              NButton,
-              {
-                strong: true,
-                tertiary: true,
-                size: "small",
                 onClick: async () => {
                   // TODO：先用这两参数试试
                   await navigateTo(`/studio/${row.git.projectId}/main`, {
@@ -96,36 +89,7 @@ const clounms: DataTableColumns<IProject> = [
                   });
                 },
               },
-              { default: () => "打开" }
-            ),
-            h(
-              NButton,
-              {
-                strong: true,
-                tertiary: true,
-                size: "small",
-                onClick: () => {
-                  const d = dialog.warning({
-                    title: "警告",
-                    content: "确定删除此项目？",
-                    positiveText: "确定",
-                    negativeText: "不确定",
-                    onPositiveClick: async () => {
-                      d.loading = true;
-                      const delSucess = await delProject(
-                        row.owner?.login,
-                        row.name
-                      );
-                      d.loading = false;
-                      if (delSucess) {
-                        refreshList();
-                      }
-                      return delSucess;
-                    },
-                  });
-                },
-              },
-              { default: () => "删除" }
+              { default: () => "编辑" }
             ),
           ],
         }

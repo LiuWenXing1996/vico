@@ -1,4 +1,5 @@
-import { Octokit } from "@octokit/core";
+// import { Octokit } from "@octokit/core";
+import { Octokit } from "octokit";
 import { createVfs, path } from "@vico/core";
 import git from "isomorphic-git";
 import http from "isomorphic-git/http/web";
@@ -19,12 +20,78 @@ export class GithubClient {
     this.#token = token;
     this.#octokit = new Octokit({ auth: token });
   }
+  async branchList(params: {
+    owner: string;
+    repo: string;
+    page: number;
+    limit: number;
+    key?: string;
+  }) {
+    const { limit, key, page, owner, repo } = params;
+    const pageRes = await this.octokit.paginate(
+      "GET /repos/{owner}/{repo}/branches",
+      {
+        owner,
+        repo,
+      }
+    );
+    const items = pageRes.slice((page - 1) * limit, page * limit);
+    return {
+      total_count: pageRes.length,
+      items,
+    };
+  }
+  async repoCreateFormTemplate(params: {
+    templateOwner: string;
+    templateRepo: string;
+    templateBranch: string;
+    name: string;
+    description?: string;
+  }) {
+    const { name, description, templateBranch, templateOwner, templateRepo } =
+      params;
+    const templateRepoZipFile = await this.getRepoZipFile({
+      owner: templateOwner,
+      repo: templateRepo,
+      branch: templateBranch,
+    });
+    const repo = await this.createRepo({ name, description });
+    const updateRes = await this.updateRepo({
+      owner: repo.owner.login,
+      repo: repo.name,
+      branch: "main",
+      message: "init by template",
+      zipFile: templateRepoZipFile,
+    });
+    return updateRes;
+  }
+
+  async getCurrnetUser() {
+    const res = await this.octokit.request("GET /user");
+    return res.data;
+  }
+  async listCurrentUserRepo(params: {
+    page: number;
+    limit: number;
+    key?: string;
+  }) {
+    const currentUser = await this.getCurrnetUser();
+    const { page, limit, key } = params;
+    const q = `user:${currentUser.login}${key ? ` ${key} in:name` : ""}`;
+    const res = await this.octokit.request("GET /search/repositories", {
+      page,
+      q,
+      per_page: limit,
+    });
+    return res.data;
+  }
   async createRepo(params: { name: string; description?: string }) {
     const { name, description } = params;
     const repoRes = await this.octokit.request("POST /user/repos", {
       name,
       description,
     });
+    console.log({ repoRes });
     return repoRes.data;
   }
   async getRepo(params: { owner: string; repo: string }) {
@@ -53,10 +120,15 @@ export class GithubClient {
       url: url,
       ref: branch,
       singleBranch: true,
+      onMessage: console.log,
       onAuth: () => {
         return {
+          username: "token",
           password: this.token,
         };
+      },
+      onAuthFailure: (s, ss) => {
+        debugger;
       },
     });
     const allFiles = await git.listFiles({ fs, dir: baseDir, ref: branch });
@@ -87,6 +159,7 @@ export class GithubClient {
     const vfs = createVfs();
     const fs = vfs.getFs();
     const baseDir = "/base";
+    // TODO:没有分支的时候需要创建分支。。。
     await git.clone({
       fs,
       http,
@@ -132,30 +205,20 @@ export class GithubClient {
     });
     return await this.getRepo({ owner, repo });
   }
-  async repoList(params: { page: number; limit: number }) {
-    const { page, limit } = params;
-    const listRes = await this.octokit.request("GET /user/repos", {
+  async searchRepo(params: { page: number; limit: number; key?: string }) {
+    const { limit, key, page } = params;
+    const q = `${key ? ` ${key} in:name` : ""}`;
+    const listRes = await this.octokit.request("GET /search/repositories", {
       page,
+      q,
       per_page: limit,
     });
-    console.log("listRes.headers.link", listRes.headers.link);
-    return listRes.data;
+    return listRes;
   }
 }
 
 export const useGithubClient = async (event: H3Event) => {
-  const userId = event.context.user?.id;
-  const prismaClient = usePrismaClient();
-  const userSecretConfig = await prismaClient.userSecretConfig.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-  if (!userSecretConfig?.githubToken) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "unknown githubToken",
-    });
-  }
-  return new GithubClient({ token: userSecretConfig.githubToken });
+  const githubTokenSession = await requireGithubTokenSession(event);
+  const githubClient = new GithubClient({ token: githubTokenSession.content });
+  return githubClient;
 };
