@@ -25,7 +25,7 @@
 // TODO：实现个人设置界面，重要的可以设置gitlab token
 import { UserGiteaTokenResetFrom } from '#components';
 import { type FormInst, NForm, NFormItem, NInput, useMessage, NSpace, NRow, NCol, NButton, type FormRules, type FormValidationError, useDialog } from 'naive-ui'
-import type { IParams } from '~/server/api/user/setting.post';
+import type { Params } from '~/server/api/user/setting.post';
 
 import type { MaybePromise } from '~/types';
 const props = defineProps<{
@@ -35,7 +35,7 @@ const { onSucess } = toRefs(props)
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
 const dialog = useDialog()
-const model = ref<Partial<IParams>>({
+const model = ref<Partial<Params>>({
     name: '',
 })
 const submitLoading = ref<boolean>(false)

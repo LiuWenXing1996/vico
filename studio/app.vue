@@ -1,14 +1,16 @@
 <template>
   <div id="app">
-    <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
-      <n-message-provider>
-        <n-dialog-provider>
-          <nuxt-layout>
-            <nuxt-page />
-          </nuxt-layout>
-        </n-dialog-provider>
-      </n-message-provider>
-    </n-config-provider>
+    <naive-config>
+      <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
+        <n-message-provider>
+          <n-dialog-provider>
+            <nuxt-layout>
+              <nuxt-page />
+            </nuxt-layout>
+          </n-dialog-provider>
+        </n-message-provider>
+      </n-config-provider>
+    </naive-config>
   </div>
 </template>
 
@@ -20,8 +22,6 @@ import {
   zhCN,
   dateZhCN,
 } from "naive-ui";
-const { fetch } = useUserSession();
-await fetch();
 </script>
 
 <style lang="less" scoped>

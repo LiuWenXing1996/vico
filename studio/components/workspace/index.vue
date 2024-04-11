@@ -7,7 +7,53 @@
     <div class="cook-studio">
       <Splitpanes>
         <Pane class="left-pane" min-size="15" size="20">
-          <WorkspaceLeftPaneContainer></WorkspaceLeftPaneContainer>
+          <workspace-left-pane-container>
+            <side-tab-pane
+              name="file-manager"
+              label="文件管理器"
+              title="文件管理器"
+              :position="SideTabPosition.top"
+            >
+              <template #icon>
+                <svg-icon name="files" />
+              </template>
+              文件管理器
+            </side-tab-pane>
+            <side-tab-pane
+              name="search"
+              label="搜索"
+              title="搜索"
+              :position="SideTabPosition.top"
+            >
+              <template #icon>
+                <svg-icon name="search" />
+              </template>
+              搜索
+            </side-tab-pane>
+            <side-tab-pane
+              name="git-server-lis"
+              label="git服务器列表"
+              title="git服务器列表"
+              :position="SideTabPosition.bottom"
+            >
+              <template #icon>
+                <svg-icon name="git-server" />
+              </template>
+              <git-server-list />
+            </side-tab-pane>
+            <side-tab-pane
+              name="app-list"
+              label="应用列表"
+              title="应用列表"
+              :position="SideTabPosition.bottom"
+            >
+              <template #icon>
+                <svg-icon name="app-list" />
+              </template>
+              <ApplicationList />
+            </side-tab-pane>
+            <SideTabPaneUser />
+          </workspace-left-pane-container>
         </Pane>
         <Pane class="center-bottom-pane" min-size="15" size="60">
           <Splitpanes horizontal>
@@ -21,10 +67,21 @@
   </n-config-provider>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
+import {
+  ApplicationList,
+  NSpace,
+  NTooltip,
+  SideTabPaneUser,
+  SvgIcon,
+  UserIcon,
+  UserLogin,
+  UserPaneTitleActions,
+  UserSetting,
+} from "#components";
 import { createVfs } from "@vico/core";
 import JSZip from "jszip";
-import { NConfigProvider, zhCN, dateZhCN } from "naive-ui";
+import { NConfigProvider, zhCN, dateZhCN, NButton } from "naive-ui";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 
@@ -33,6 +90,8 @@ const props = defineProps<{
   branch?: string;
 }>();
 const { repo, branch } = toRefs(props);
+
+
 const vfs = createVfs();
 watch(
   [repo, branch],

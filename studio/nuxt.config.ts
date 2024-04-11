@@ -2,12 +2,17 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["nuxt-auth-utils", "nuxt-icons"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@bg-dev/nuxt-naiveui",
+    "nuxt-auth-utils",
+    "nuxt-icons",
+    "nuxt-radash",
+  ],
   pages: true,
   routeRules: {
     "/studio/**": { ssr: false },
-    "/auth/**": { ssr: false },
-    "/admin/**": { ssr: false },
+    "/login": { ssr: false },
   },
   devtools: { enabled: true },
   vite: {

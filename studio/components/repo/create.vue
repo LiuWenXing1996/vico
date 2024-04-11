@@ -83,7 +83,7 @@ import {
   type FormRules,
   type FormValidationError,
 } from "naive-ui";
-import type { IParams } from "~/server/api/repo/create.post";
+import type { Params } from "~/server/api/repo/create.post";
 import type { IGitlabTemplateListReturn } from "~/server/api/gitlab/template/list.get";
 import type { GitHubRepo, MaybePromise } from "~/types";
 import { useRequest } from "vue-request";
@@ -94,7 +94,7 @@ const emits = defineEmits<{
 const formRef = ref<FormInst | null>(null);
 const message = useMessage();
 const selectedTpl = ref<GitHubRepo>();
-export type IFormValue = Omit<IParams, "templateOwner" | "templateRepo"> & {
+export type IFormValue = Omit<Params, "templateOwner" | "templateRepo"> & {
   templatePath: string;
   templateBranch: string;
 };
@@ -198,7 +198,7 @@ const submit = async () => {
     });
     return;
   }
-  const params: IParams = {
+  const params: Params = {
     name: formValue.value.name,
     description: formValue.value.description,
     templateOwner: selectedTpl.value?.owner?.login || "",

@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import md5 from "md5";
 import type { H3Event } from "h3";
 import { defu } from "defu";
+import CryptoJS from "crypto-js";
 
 let prismaClient: PrismaClient | null = null;
 
@@ -62,4 +63,22 @@ export const useGithubTokenSession = async (event: H3Event) => {
   return useSession<{
     value: string;
   }>(event, sessionConfig);
+};
+
+export const getDbCryptoHelper = () => {
+  const password = process.env.DATABASE_CRYPTO_PASSWORD;
+  if (!password) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "undefined DATABASE_CRYPTO_PASSWORD",
+    });
+  }
+  return {
+    decrypt: (value: string) => {
+      return CryptoJS.AES.decrypt(value, password).toString(CryptoJS.enc.Utf8);
+    },
+    encrypt: (value: string) => {
+      return CryptoJS.AES.encrypt(value, password).toString();
+    },
+  };
 };

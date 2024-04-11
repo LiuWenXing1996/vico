@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import { type SelectOption, type FormInst, NForm, NSelect, NDivider, NFormItem, NInput, useMessage, NSpace, NRow, NCol, NButton, type FormRules, type FormValidationError } from 'naive-ui'
-import type { IParams } from '~/server/api/project/create.post';
+import type { Params } from '~/server/api/project/create.post';
 import type { IGitlabTemplateListReturn } from "~/server/api/gitlab/template/list.get"
 import type { MaybePromise } from '~/types';
 const props = withDefaults(defineProps<{
@@ -39,7 +39,7 @@ const props = withDefaults(defineProps<{
 const { onSucess } = toRefs(props)
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
-export type IFormValue = Omit<IParams, "templateOwner" | "templateRepo"> & {
+export type IFormValue = Omit<Params, "templateOwner" | "templateRepo"> & {
     templatePath: string
 }
 const genTemplatePath = (templateOwner: string, templateRepo: string) => {
@@ -59,7 +59,7 @@ const formValue = ref<IFormValue>({
     description: '',
     templatePath: ''
 })
-const model = ref<Partial<IParams>>({
+const model = ref<Partial<Params>>({
     name: '',
 })
 const submitLoading = ref<boolean>(false)

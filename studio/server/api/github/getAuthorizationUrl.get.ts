@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useH3Session } from "~/server/utils/h3";
 
 const paramsScheam = z.undefined();
-export type IParams = z.infer<typeof paramsScheam>;
-export type IReturn = Awaited<ReturnType<typeof handler>>;
+export type Params = z.infer<typeof paramsScheam>;
+export type Return = Awaited<ReturnType<typeof handler>>;
 const handler = defineEventHandler(async (event) => {
   const state = `vico_github_oauth_state_${uuidv4()}`;
   const session = await useH3Session(event);

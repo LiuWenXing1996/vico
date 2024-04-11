@@ -47,7 +47,7 @@ import {
   type FormValidationError,
   useDialog,
 } from "naive-ui";
-import type { IParams } from "~/server/api/user/giteaTokenReset.post";
+import type { Params } from "~/server/api/user/giteaTokenReset.post";
 
 import type { MaybePromise } from "~/types";
 const props = defineProps<{
@@ -56,7 +56,7 @@ const props = defineProps<{
 const { onSucess } = toRefs(props);
 const formRef = ref<FormInst | null>(null);
 const message = useMessage();
-const model = ref<Partial<IParams>>({
+const model = ref<Partial<Params>>({
   giteaToken: "",
 });
 const submitLoading = ref<boolean>(false);

@@ -3,8 +3,8 @@ import { oauthAuthorizationUrl } from "@octokit/oauth-authorization-url";
 
 const paramsScheam = z.object({});
 
-export type IParams = z.infer<typeof paramsScheam>;
-export type IReturn = Awaited<ReturnType<typeof handler>>;
+export type Params = z.infer<typeof paramsScheam>;
+export type Return = Awaited<ReturnType<typeof handler>>;
 const handler = defineEventHandler(async (event) => {
   const { url, clientId, redirectUrl, login, scopes, state } =
     oauthAuthorizationUrl({

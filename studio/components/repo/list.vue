@@ -39,8 +39,8 @@ import {
   NButton,
   useDialog,
 } from "naive-ui";
-import type { IReturn } from "~/server/api/repo/list.get";
-type IRepo = IReturn["items"][0];
+import type { Return } from "~/server/api/repo/list.get";
+type IRepo = Return["items"][0];
 const dialog = useDialog();
 withDefaults(
   defineProps<{

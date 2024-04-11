@@ -1,5 +1,5 @@
 <template>
-  <span class="svg-icon">
+  <span class="flex items-center">
     <n-icon :size="size" :color="color" :depth="depth">
       <nuxt-icon :name="name" />
     </n-icon>
@@ -14,13 +14,3 @@ defineProps<{
   depth?: IconProps["depth"];
 }>();
 </script>
-<style lang="less" scoped>
-.svg-icon {
-  :deep(.nuxt-icon) {
-    svg {
-      margin-bottom: 0;
-      vertical-align: top;
-    }
-  }
-}
-</style>

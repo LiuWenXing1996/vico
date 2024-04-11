@@ -18,6 +18,17 @@ export const filterNullable = <T>(
   }) as NonNullable<T>[];
 };
 
+export const excludeObject = <T extends Object, Key extends keyof T>(
+  obj: T,
+  keys: Key[]
+): Omit<T, Key> => {
+  // @ts-ignore
+  return Object.fromEntries(
+    // @ts-ignore
+    Object.entries(obj).filter(([key]) => !keys.includes(key))
+  );
+};
+
 export const genProjectName = () => {
   return `vico-${uuidv4()}`;
 };

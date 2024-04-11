@@ -1,58 +1,78 @@
-import type { H3Event, EventHandlerRequest } from "h3";
+import type { H3Event } from "h3";
 
-export const useUser = async (event: H3Event) => {
-  const useId = event.context.user?.id;
-  const prismaClient = usePrismaClient();
-  const user = await prismaClient.user.findUnique({
-    where: {
-      id: useId,
-    },
-  });
-  return user;
-};
-
-export interface IEventContextUserData {
+interface UserSessionData {
   id: number;
 }
 
-export const resolveUserDataFromEvent = (
-  event: H3Event<EventHandlerRequest>
-) => {
-  const data = event.context.user;
-  const _data = JSON.parse(JSON.stringify(data));
-  return _data as IEventContextUserData | undefined;
+export enum UserRole {
+  admin = "admin",
+  user = "user",
+}
+
+export const useUserSession = async (event: H3Event) => {
+  const maxAge = 60 * 60 * 24 * 7;
+  const expires = Math.floor(Date.now() / 1000) + maxAge;
+  return await useSession<Partial<UserSessionData>>(event, {
+    password: getUserSessionPassword(),
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge,
+      expires: new Date(expires * 1000),
+      path: "/",
+    },
+    name: "vico-user-token-session",
+  });
 };
 
-export const setUserDataToEvent = (
-  event: H3Event<EventHandlerRequest>,
-  data: IEventContextUserData | undefined
-) => {
-  const _data = JSON.parse(JSON.stringify(data));
-  event.context.user = { ..._data };
+const getUserSessionPassword = () => {
+  const password = process.env.USER_SESSION_PASSWORD;
+  if (!password) {
+    throw createError({
+      statusCode: 500,
+      message: "undefined USER_SESSION_PASSWORD",
+    });
+  }
+  return password;
 };
 
-export const resolveCurrentUserFromEvent = async (
-  event: H3Event<EventHandlerRequest>
-) => {
-  const userId = resolveUserDataFromEvent(event)?.id;
-  const prismaClient = usePrismaClient();
-  const user = await prismaClient.user.findUnique({
+export const getCurrentUser = async (event: H3Event) => {
+  const userSession = await useUserSession(event);
+  const userId = userSession.data.id;
+  if (!userId) {
+    return;
+  }
+  const prisma = usePrismaClient();
+  const user = await prisma.user.findUnique({
     where: {
       id: userId,
     },
   });
+  if (user) {
+    user.password = "***";
+  }
   return user;
 };
 
-export const resolveUserSecretConfigFromEvent = async (
-  event: H3Event<EventHandlerRequest>
-) => {
-  const userId = resolveUserDataFromEvent(event)?.id;
-  const prismaClient = usePrismaClient();
-  const userSecretConfig = await prismaClient.userSecretConfig.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-  return userSecretConfig;
+export const requireCurrentUser = async (event: H3Event) => {
+  const user = await getCurrentUser(event);
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      message: "用户未登录",
+    });
+  }
+  return user;
+};
+
+export const requireCurrentAdminUser = async (event: H3Event) => {
+  const user = await requireCurrentUser(event);
+  if (user.role !== UserRole.admin) {
+    throw createError({
+      statusCode: 401,
+      message: "用户不是管理员",
+    });
+  }
+  return user;
 };

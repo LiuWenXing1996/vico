@@ -10,3 +10,14 @@ export const useH3Session = async (event: H3Event) => {
 
   return session;
 };
+
+export const getH3SessionPassword = () => {
+  const password = process.env.H3_SESSION_PASSWORD;
+  if (!password) {
+    throw createError({
+      statusCode: 500,
+      message: "undefined H3_SESSION_PASSWORD",
+    });
+  }
+  return password;
+};

@@ -7,7 +7,7 @@ export interface IJwtPayloadData {
   name: string;
 }
 
-export const access_token_name = "access_token";
+export const access_token_name = "vico_access_token";
 
 export const jwtSign = (
   event: H3Event<EventHandlerRequest>,
@@ -44,4 +44,8 @@ export const jwtVerify = (event: H3Event<EventHandlerRequest>) => {
     } catch (error) {}
     return payloadData;
   }
+};
+
+export const jwtClear = (event: H3Event<EventHandlerRequest>) => {
+  setCookie(event, access_token_name, "");
 };

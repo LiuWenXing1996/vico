@@ -7,10 +7,12 @@
     "dev": "nuxt dev --inspect",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db": "prisma db push"
   },
   "dependencies": {
     "@auth/core": "^0.28.0",
+    "@bg-dev/nuxt-naiveui": "^1.12.2",
     "@gitbeaker/rest": "^39.34.3",
     "@hebilicious/authjs-nuxt": "^0.3.5",
     "@isomorphic-git/lightning-fs": "^4.6.0",
@@ -23,6 +25,7 @@
     "@vicons/antd": "^0.12.0",
     "@vicons/ionicons5": "^0.12.0",
     "cross-fetch": "^4.0.0",
+    "crypto-js": "^4.2.0",
     "defu": "^6.1.4",
     "gitea-js": "^1.20.1",
     "h3-zod": "^0.5.3",
@@ -34,6 +37,7 @@
     "mongoose": "^8.2.1",
     "naive-ui": "^2.38.1",
     "nuxt": "^3.10.3",
+    "nuxt-radash": "^1.0.0",
     "octokit": "^3.1.2",
     "perfect-debounce": "^1.0.0",
     "prisma": "^5.10.2",
@@ -46,6 +50,10 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^0.27.2",
+    "@mermaid-js/mermaid-cli": "^10.8.0",
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "@types/crypto-js": "^4.2.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/md5": "^2.3.5",
     "@types/splitpanes": "^2.2.6",
@@ -53,7 +61,9 @@
     "less": "^4.2.0",
     "nuxt-auth-utils": "^0.0.21",
     "nuxt-icons": "^3.2.1",
-    "vite-plugin-node-polyfills": "^0.21.0"
+    "prisma-erd-generator": "^1.11.2",
+    "vite-plugin-node-polyfills": "^0.21.0",
+    "vue-jsx-runtime": "^0.1.0"
   },
   "peerDependencies": {
     "next-auth": "4.21.1"

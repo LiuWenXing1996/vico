@@ -32,8 +32,8 @@ import {
   type FormInst,
 } from "naive-ui";
 import type { ISearchValue } from "./list/serach.vue";
-import type { IReturn } from "~/server/api/project/list.get";
-type IProject = IReturn["items"][0];
+import type { Return } from "~/server/api/project/list.get";
+type IProject = Return["items"][0];
 const searchValue = ref<ISearchValue>({ name: "" });
 const {
   data,

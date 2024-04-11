@@ -2,15 +2,14 @@ import { Octokit } from "@octokit/core";
 import type { Endpoints } from "@octokit/types";
 import { z } from "zod";
 import { getGiteaClient } from "~/server/utils/giteaClient";
-import { resolveUserSecretConfigFromEvent } from "~/server/utils/user";
 
 export const paramsScheam = z.object({
   key: z.string().optional(),
   page: z.coerce.number().min(1),
   limit: z.coerce.number().min(1),
 });
-export type IParams = z.infer<typeof paramsScheam>;
-export type IReturn = Awaited<ReturnType<typeof handler>>;
+export type Params = z.infer<typeof paramsScheam>;
+export type Return = Awaited<ReturnType<typeof handler>>;
 const handler = defineEventHandler(async (event) => {
   const data = await getValidatedQuery(event, (data) => {
     return paramsScheam.parse(data);
