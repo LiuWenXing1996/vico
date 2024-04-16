@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 export const paramsScheam = z.object({
-  repoId: z.string().min(1),
-  key: z.string().optional(),
-  page: z.coerce.number().min(1),
-  limit: z.coerce.number().min(1),
+  id: z.coerce.string().min(1),
 });
 export type Params = z.infer<typeof paramsScheam>;
 export type Return = Awaited<ReturnType<typeof handler>>;
@@ -13,12 +10,7 @@ const handler = defineEventHandler(async (event) => {
     return paramsScheam.parse(data);
   });
   const githubClient = await useGithubClient(event);
-  const res = await githubClient.branchList({
-    repoId: data.repoId,
-    page: data.page,
-    limit: data.limit,
-    key: data.key,
-  });
+  const res = await githubClient.repoDetail(data.id);
   return res;
 });
 

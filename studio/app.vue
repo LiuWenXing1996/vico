@@ -22,6 +22,9 @@ import {
   zhCN,
   dateZhCN,
 } from "naive-ui";
+import "./style.global.less";
+const { fetch } = useUserSession();
+await fetch();
 </script>
 
 <style lang="less" scoped>

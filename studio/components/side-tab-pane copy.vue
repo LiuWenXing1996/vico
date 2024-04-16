@@ -1,10 +1,8 @@
 <template>
   <div v-show="sideTabsProvide?.currentTabKey.value === name" class="h-full">
-    <div v-if="canRender" class="h-full w-full">
-      <div
-        class="w-full h-[35px] flex justify-between items-center px-[10px] border-b"
-      >
-        <div class="flex items-center h-full">
+    <div v-if="canRender" class="h-full">
+      <div class="left-pane-item-title-wrapper">
+        <div class="left-pane-item-title">
           <template v-if="title">
             {{ title }}
           </template>
@@ -12,11 +10,11 @@
             <slot name="title"></slot>
           </template>
         </div>
-        <div>
+        <div class="left-pane-item-title-actions">
           <slot name="titleActions"></slot>
         </div>
       </div>
-      <div class="h-[calc(100%-35px)] overflow-auto">
+      <div class="left-pane-item-body">
         <slot name="default"></slot>
       </div>
     </div>
@@ -38,6 +36,7 @@ const slots = defineSlots<{
   title(): any;
 }>();
 const { name, position, label } = toRefs(props);
+const themeVars = useThemeVars();
 const canRender = ref(false);
 const sideTabsProvide = useSideTabsProvide();
 onMounted(() => {
@@ -60,3 +59,26 @@ watch(
   }
 );
 </script>
+<style lang="less" scoped>
+.left-pane-item-title-wrapper {
+  width: 100%;
+  height: 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: solid 1px;
+  padding: 0px 10px;
+  box-sizing: border-box;
+  border-color: v-bind("themeVars.borderColor");
+}
+.left-pane-item-title {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.left-pane-item-body {
+  padding: 10px;
+  height: calc(100% - 35px);
+  overflow: auto;
+}
+</style>

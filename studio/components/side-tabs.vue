@@ -1,12 +1,12 @@
 <template>
-  <n-layout has-sider>
+  <n-layout has-sider class="h-full">
     <n-layout-sider bordered :width="64">
-      <div class="menus-wrapper">
+      <div class="flex flex-col justify-between h-full">
         <n-menu :options="topMenuOptions" v-bind="commonMenuProps" />
         <n-menu :options="bottomMenuOptions" v-bind="commonMenuProps" />
       </div>
     </n-layout-sider>
-    <div class="left-content">
+    <div class="h-full w-[calc(100%-64px)]">
       <slot></slot>
     </div>
   </n-layout>
@@ -56,37 +56,3 @@ watch(tabs, () => {
   }
 });
 </script>
-
-<style lang="less" scoped>
-.menus-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-}
-
-.left-content {
-  height: 100%;
-  width: calc(100% - 64px);
-  box-sizing: border-box;
-  .left-pane-item-title-wrapper {
-    width: 100%;
-    height: 35px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: solid 1px;
-    padding: 0px 10px;
-    box-sizing: border-box;
-    border-color: v-bind("themeVars.borderColor");
-  }
-  .left-pane-item-title {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-  .left-pane-item-body {
-    padding: 10px;
-  }
-}
-</style>

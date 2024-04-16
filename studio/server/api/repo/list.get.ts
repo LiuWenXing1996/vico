@@ -12,7 +12,7 @@ const handler = defineEventHandler(async (event) => {
     return paramsScheam.parse(data);
   });
   const githubClient = await useGithubClient(event);
-  const res = await githubClient.listCurrentUserRepo({
+  const res = await githubClient.repoList({
     page: data.page,
     limit: data.limit,
     key: data.key,

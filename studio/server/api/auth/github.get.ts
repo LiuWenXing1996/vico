@@ -17,10 +17,10 @@ export default oauth.githubEventHandler({
         avatar_url: githubUser.avatar_url,
       },
     });
+    console.log({
+      tokens
+    })
     await setGithubTokenSession(event, { content: tokens?.access_token });
     return sendRedirect(event, "/studio");
-  },
-  async onError(event, error) {
-    return sendRedirect(event, "/studio");
-  },
+  }
 });

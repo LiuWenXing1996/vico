@@ -21,8 +21,13 @@
       </n-descriptions>
       <template #action v-if="actions?.length && actions?.length > 0">
         <n-space>
-          <n-button v-for="item in actions" size="small" @click="item.onClick">
-            {{ item.text }}
+          <n-button :focusable="false" v-for="item in actions" size="tiny" @click="item.onClick">
+            <template #icon v-if="item.icon">
+              <svg-icon :name="item.icon" />
+            </template>
+            <template v-if="item.text">
+              {{ item.text }}
+            </template>
           </n-button>
         </n-space>
       </template>
@@ -34,7 +39,8 @@ defineProps<{
   name?: string;
   descriptions?: Record<string, string | null | undefined>;
   actions?: {
-    text: string;
+    text?: string;
+    icon?: string;
     onClick: () => void;
   }[];
 }>();

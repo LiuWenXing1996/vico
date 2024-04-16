@@ -1,7 +1,7 @@
 <template>
   <span class="flex items-center">
     <n-icon :size="size" :color="color" :depth="depth">
-      <nuxt-icon :name="name" />
+      <nuxt-icon :name="name" :filled="!unFilled" />
     </n-icon>
   </span>
 </template>
@@ -12,5 +12,6 @@ defineProps<{
   color?: IconProps["color"];
   size?: IconProps["size"];
   depth?: IconProps["depth"];
+  unFilled?: boolean;
 }>();
 </script>
