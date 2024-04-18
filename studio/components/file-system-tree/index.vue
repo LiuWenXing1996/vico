@@ -6,7 +6,7 @@ import { listToTree, type IItem, getAllPaths, isDir } from "./utils";
 import type { FSWatcher } from "node:fs";
 import type { VNodeChild } from "vue";
 const props = defineProps<{
-  vfs: IVirtulFileSystem;
+  vfs?: IVirtulFileSystem;
   selectedKeys?: string[];
 }>();
 
@@ -46,6 +46,9 @@ const treeData = computed(() => {
         label: allPathPoints[allPathPoints.length - 1],
         value: e,
         prefix: () => {
+          if (!vfs.value) {
+            return;
+          }
           if (isDir(vfs.value, e)) {
             return h(NIcon, null, {
               default: () => h(Folder),
@@ -64,15 +67,19 @@ watch(
   vfs,
   () => {
     currentFsWatcher.value?.close();
-    vfs.value.listFiles().then((res) => {
-      filePathList.value = res;
-    });
-    const fs = vfs.value.getFs();
-    currentFsWatcher.value = fs.watch("/", {}, () => {
+    if (vfs.value) {
       vfs.value.listFiles().then((res) => {
         filePathList.value = res;
       });
-    }) as unknown as FSWatcher;
+      const fs = vfs.value.getFs();
+      currentFsWatcher.value = fs.watch("/", {}, () => {
+        if (vfs.value) {
+          vfs.value.listFiles().then((res) => {
+            filePathList.value = res;
+          });
+        }
+      }) as unknown as FSWatcher;
+    }
   },
   {
     immediate: true,

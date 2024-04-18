@@ -14,6 +14,7 @@ export interface GitServerRepo {
   id: string;
   name: string;
   user: GitServerUser;
+  url: string;
   description?: string;
 }
 

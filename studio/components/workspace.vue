@@ -6,24 +6,14 @@
   >
     <div class="h-full flex flex-col">
       <div class="h-[50px] flex items-center border-b px-[10px]">
-        {{ repoName }}
-        {{ branchName }}
+        {{ repoId }}
+        {{ branchId }}
       </div>
       <div class="h-[calc(100%-50px)]">
         <Splitpanes>
           <Pane class="left-pane" min-size="15" size="20">
             <side-tabs>
-              <side-tab-pane
-                name="file-manager"
-                label="文件管理器"
-                title="文件管理器"
-                :position="SideTabPosition.top"
-              >
-                <template #icon>
-                  <svg-icon name="files" />
-                </template>
-                文件管理器
-              </side-tab-pane>
+              <side-tab-pane-files :repo-id="repoId" :branch-id="branchId" />
               <side-tab-pane
                 name="search"
                 label="搜索"
@@ -35,29 +25,7 @@
                 </template>
                 搜索
               </side-tab-pane>
-              <side-tab-pane-versions />
-              <side-tab-pane
-                name="git-server-lis"
-                label="git服务器列表"
-                title="git服务器列表"
-                :position="SideTabPosition.bottom"
-              >
-                <template #icon>
-                  <svg-icon name="git-server" />
-                </template>
-                <git-server-list />
-              </side-tab-pane>
-              <side-tab-pane
-                name="app-list"
-                label="应用列表"
-                title="应用列表"
-                :position="SideTabPosition.bottom"
-              >
-                <template #icon>
-                  <svg-icon name="app-list" />
-                </template>
-                <ApplicationList />
-              </side-tab-pane>
+              <side-tab-pane-versions :repoId="repoId" />
               <SideTabPaneUser />
             </side-tabs>
           </Pane>
@@ -95,10 +63,10 @@ import type { Params as BranchDetailParams } from "~/server/api/branch/detail.ge
 import "splitpanes/dist/splitpanes.css";
 
 const props = defineProps<{
-  repoName?: string;
-  branchName?: string;
+  repoId?: string;
+  branchId?: string;
 }>();
-const { repoName, branchName } = toRefs(props);
+const { repoId, branchId } = toRefs(props);
 const currentRepo = ref<GitServerRepo>();
 const currentBranch = ref<GitServerRepo>();
 createWorkspaceProvide({
@@ -108,11 +76,11 @@ createWorkspaceProvide({
 const repoDetailRequest = useCustomRequest(async () => {
   currentRepo.value = undefined;
   currentBranch.value = undefined;
-  if (!repoName.value) {
+  if (!repoId.value) {
     return undefined;
   }
   const params: RepoDetailParams = {
-    id: repoName.value,
+    id: repoId.value,
   };
   const repo = await $fetch("/api/repo/detail", {
     params,
@@ -122,11 +90,11 @@ const repoDetailRequest = useCustomRequest(async () => {
 });
 const branchDetailRequest = useCustomRequest(async () => {
   currentBranch.value = undefined;
-  if (!branchName.value) {
+  if (!branchId.value) {
     return undefined;
   }
   const params: BranchDetailParams = {
-    id: branchName.value,
+    id: branchId.value,
   };
   const repo = await $fetch("/api/branch/detail", {
     params,
@@ -134,11 +102,11 @@ const branchDetailRequest = useCustomRequest(async () => {
   currentBranch.value = repo;
   return repo;
 });
-watch(repoName, async () => {
+watch(repoId, async () => {
   await repoDetailRequest.refreshAsync();
   await branchDetailRequest.refreshAsync();
 });
-watch(branchName, async () => {
+watch(branchId, async () => {
   await branchDetailRequest.refreshAsync();
 });
 </script>

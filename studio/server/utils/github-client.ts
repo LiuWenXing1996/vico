@@ -1,4 +1,3 @@
-// import { Octokit } from "@octokit/core";
 import { Octokit } from "octokit";
 import { createVfs, path } from "@vico/core";
 import git from "isomorphic-git";
@@ -33,7 +32,7 @@ export class GithubClient extends GitServerClient {
     super(token);
     this.#octokit = new Octokit({ auth: token });
   }
-  idParse(id: string) {
+  repoIdParse(id: string) {
     try {
       const [owner, repo] = id.split("/");
       return { owner, repo };
@@ -41,7 +40,7 @@ export class GithubClient extends GitServerClient {
       throw error;
     }
   }
-  idStringify(owner: string, repo: string) {
+  repoIdStringify(owner: string, repo: string) {
     return `${owner}/${repo}`;
   }
   ownerToGitServerUser(owner: GithubUser | undefined | null) {
@@ -53,9 +52,10 @@ export class GithubClient extends GitServerClient {
   }
   repoToGitServerRepo(repo: GithubRepo) {
     return {
-      id: this.idStringify(repo.owner?.login || "", repo.name),
+      id: this.repoIdStringify(repo.owner?.login || "", repo.name),
       name: repo.name,
       user: this.ownerToGitServerUser(repo.owner),
+      url: repo.html_url,
       description: repo.description || undefined,
     };
   }
@@ -91,7 +91,7 @@ export class GithubClient extends GitServerClient {
   }
   async repoDetail(params: { id: string }): Promise<GitServerRepo | undefined> {
     const { id } = params;
-    const { owner, repo } = this.idParse(id);
+    const { owner, repo } = this.repoIdParse(id);
     const res = await this.octokit.request("GET /repos/{owner}/{repo}", {
       repo,
       owner,
@@ -125,7 +125,7 @@ export class GithubClient extends GitServerClient {
     items: GitServerBranch[];
   }> {
     const { limit, key, page, repoId } = params;
-    const { owner, repo } = this.idParse(repoId);
+    const { owner, repo } = this.repoIdParse(repoId);
     const res = await this.octokit.graphql(
       `{
         repository(owner: "${owner}", name: "${repo}") {
@@ -144,8 +144,8 @@ export class GithubClient extends GitServerClient {
       }`
     );
     return {
-      total: res.data.repository.refs.totalCount || 0,
-      items: (res.data.repository.refs.nodes || []).map((e: any) => {
+      total: res.repository.refs.totalCount || 0,
+      items: (res.repository.refs.nodes || []).map((e: any) => {
         return {
           name: e.name,
         };
@@ -157,7 +157,7 @@ export class GithubClient extends GitServerClient {
     id: string;
   }): Promise<GitServerBranch | undefined> {
     const { repoId, id } = params;
-    const { owner, repo } = this.idParse(repoId);
+    const { owner, repo } = this.repoIdParse(repoId);
     const res = await this.octokit.request(
       "GET /repos/{owner}/{repo}/branches/{branch}",
       {
@@ -167,6 +167,51 @@ export class GithubClient extends GitServerClient {
       }
     );
     return this.branchToGitServerBranch(res.data);
+  }
+  async files(params: {
+    repoId: string;
+    branchId: string;
+  }): Promise<Blob | undefined> {
+    const { repoId, branchId } = params;
+    const repoDetail = await this.repoDetail({ id: repoId });
+    if (!repoDetail) {
+      return;
+    }
+    const vfs = createVfs();
+    const fs = vfs.getFs();
+    const baseDir = "/base";
+    await git.clone({
+      fs,
+      http,
+      dir: baseDir,
+      url: repoDetail.url,
+      ref: branchId,
+      singleBranch: true,
+      onMessage: console.log,
+      onAuth: () => {
+        return {
+          username: "token",
+          password: this.token,
+        };
+      },
+      onAuthFailure: (s, ss) => {
+        debugger;
+      },
+    });
+    const allFiles = await git.listFiles({ fs, dir: baseDir, ref: branchId });
+    const zip = new JSZip();
+    await Promise.all(
+      allFiles.map(async (filePath) => {
+        const content = await vfs.readFile(
+          path.default.join(baseDir, filePath)
+        );
+        zip.file(filePath, content);
+      })
+    );
+    const blobRes = await zip.generateAsync({
+      type: "blob",
+    });
+    return blobRes;
   }
 }
 

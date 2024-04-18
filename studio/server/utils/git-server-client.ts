@@ -45,4 +45,8 @@ export abstract class GitServerClient {
     repoId: string;
     id: string;
   }): Promise<GitServerBranch | undefined>;
+  abstract files(params: {
+    repoId: string;
+    branchId: string;
+  }): Promise<Blob | undefined>;
 }
