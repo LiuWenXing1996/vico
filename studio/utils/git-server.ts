@@ -20,4 +20,5 @@ export interface GitServerRepo {
 
 export interface GitServerBranch {
   name: string;
+  id: string;
 }

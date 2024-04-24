@@ -14,32 +14,8 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  name      String
   email     String   @unique
-  avatarUrl String
-  apps      App[]
+  gitToken  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model App {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  description String?
-  versions    AppVersion[]
-  users       User[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model AppVersion {
-  id            Int      @id @default(autoincrement())
-  name          String
-  description   String?
-  applicationId Int
-  application   App      @relation(fields: [applicationId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([applicationId, name])
 }

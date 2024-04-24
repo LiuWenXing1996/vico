@@ -17,11 +17,8 @@ declare module "next-auth" {
 }
 
 declare module "#auth-utils" {
-  type GithubUser = Endpoints["GET /user"]["response"]["data"];
   interface User {
-    login: GithubUser["login"];
-    avatar_url: GithubUser["avatar_url"];
-    id: GithubUser["id"];
+    id: number;
   }
 }
 

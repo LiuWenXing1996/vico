@@ -76,3 +76,21 @@ export const requireCurrentAdminUser = async (event: H3Event) => {
   }
   return user;
 };
+
+export const useUserGitToken = async (event: H3Event) => {
+  const dbCryptoHelper = getDbCryptoHelper();
+  const { user: { id: userId } = {} } = await getUserSession(event);
+  const prisma = usePrismaClient();
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  if (!user) {
+    return;
+  }
+  if (!user.gitToken) {
+    return;
+  }
+  return dbCryptoHelper.decrypt(user.gitToken);
+};

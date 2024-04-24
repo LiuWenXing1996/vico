@@ -5,11 +5,11 @@ import {
 } from "~/utils/git-server";
 
 export abstract class GitServerClient {
-  #token: string;
+  #token?: string;
   get token() {
     return this.#token;
   }
-  constructor(token: string) {
+  constructor(token?: string) {
     this.#token = token;
   }
   abstract currentUser(): Promise<GitServerUser>;

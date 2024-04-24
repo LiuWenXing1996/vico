@@ -9,12 +9,12 @@
       <img
         class="w-[34px] h-[34px] rounded-full border border-slate-200 cursor-pointer"
         v-else="!loggedIn"
-        :src="currentUser.avatar_url"
+        :src="currentUser.avatarUrl"
       />
     </n-dropdown>
     <DefineTemplate>
       <div class="px-[12px] py-[10px]" v-if="currentUser">
-        {{ currentUser.login }}
+        {{ currentUser.name }}
       </div>
     </DefineTemplate>
   </div>
@@ -23,7 +23,7 @@
 // TODO:qingzao
 // 轻造
 // TODO:
-const { loggedIn, user: currentUser, clear } = useUserSession();
+const { loggedIn, currentUser, logout } = useCurrentUser();
 const [DefineTemplate, ReuseTemplate] = createReusableTemplate();
 const dialog = useDialog();
 const options = computed(() => {
@@ -64,7 +64,7 @@ const showLogoutDialog = () => {
     positiveText: "确定",
     negativeText: "不确定",
     onPositiveClick: async () => {
-      await clear();
+      await logout();
     },
     onNegativeClick: () => {},
   });

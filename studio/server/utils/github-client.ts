@@ -7,6 +7,7 @@ import type { H3Event } from "h3";
 import { GitServerClient } from "./git-server-client";
 import { GitServerRepo, GitServerBranch } from "~/utils/git-server";
 import type { Endpoints } from "@octokit/types";
+import { useUserGitToken } from "~/server/utils/user";
 
 export type GithubUser = Pick<
   Endpoints["GET /user"]["response"]["data"],
@@ -28,20 +29,21 @@ export class GithubClient extends GitServerClient {
   get octokit() {
     return this.#octokit;
   }
-  constructor(token: string) {
+  constructor(token?: string) {
     super(token);
     this.#octokit = new Octokit({ auth: token });
   }
   repoIdParse(id: string) {
     try {
-      const [owner, repo] = id.split("/");
+      const repoId = id ? atob(id) : "";
+      const [owner, repo] = repoId.split("/");
       return { owner, repo };
     } catch (error) {
       throw error;
     }
   }
   repoIdStringify(owner: string, repo: string) {
-    return `${owner}/${repo}`;
+    return btoa(`${owner}/${repo}`);
   }
   ownerToGitServerUser(owner: GithubUser | undefined | null) {
     return {
@@ -61,6 +63,7 @@ export class GithubClient extends GitServerClient {
   }
   branchToGitServerBranch(branch: GithubBranch): GitServerBranch {
     return {
+      id: branch.name,
       name: branch.name,
     };
   }
@@ -129,10 +132,11 @@ export class GithubClient extends GitServerClient {
     const res = await this.octokit.graphql(
       `{
         repository(owner: "${owner}", name: "${repo}") {
-          refs(first: 50,query:"${key}" ,refPrefix: "refs/heads/") {
+          refs(first: 50 ,refPrefix: "refs/heads/") {
             totalCount,
             nodes {
               name,
+              id,
               target {
                 ... on Commit{
                   committedDate
@@ -148,6 +152,7 @@ export class GithubClient extends GitServerClient {
       items: (res.repository.refs.nodes || []).map((e: any) => {
         return {
           name: e.name,
+          id: e.name,
         };
       }),
     };
@@ -216,7 +221,7 @@ export class GithubClient extends GitServerClient {
 }
 
 export const useGithubClient = async (event: H3Event) => {
-  const githubTokenSession = await requireGithubTokenSession(event);
-  const githubClient = new GithubClient(githubTokenSession.content);
+  const gitToken = await useUserGitToken(event);
+  const githubClient = new GithubClient(gitToken);
   return githubClient;
 };
