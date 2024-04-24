@@ -12,64 +12,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model GitServer {
-  id                Int                 @id @default(autoincrement())
-  name              String              @unique
-  type              String
-  description       String?
-  origin            String
-  oAuthClientId     String
-  oAuthClientSecret String
-  applications      Application[]
-  users             UsersOnGitServers[]
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-}
-
 model User {
-  id           Int                 @id @default(autoincrement())
-  email        String              @unique
-  name         String              @unique
-  role         String
-  password     String
-  applications Application[]
-  gitServers   UsersOnGitServers[]
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  avatarUrl String
+  apps      App[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model UsersOnGitServers {
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int
-  gitServer   GitServer @relation(fields: [gitServerId], references: [id])
-  gitServerId Int
-  token       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@id([userId, gitServerId])
-}
-
-model Application {
-  id          Int                  @id @default(autoincrement())
-  name        String               @unique
+model App {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
   description String?
-  gitServerId Int
-  gitServer   GitServer            @relation(fields: [gitServerId], references: [id])
-  versions    ApplicationVersion[]
+  versions    AppVersion[]
   users       User[]
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
-model ApplicationVersion {
-  id            Int         @id @default(autoincrement())
+model AppVersion {
+  id            Int      @id @default(autoincrement())
   name          String
   description   String?
   applicationId Int
-  application   Application @relation(fields: [applicationId], references: [id])
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  application   App      @relation(fields: [applicationId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([applicationId, name])
 }

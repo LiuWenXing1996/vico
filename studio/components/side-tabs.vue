@@ -21,7 +21,16 @@ import {
 const tabs = ref<SideTab[]>([]);
 const selectedKey = ref<string>();
 const addTab = (item: SideTab) => {
-  tabs.value = [...tabs.value, item];
+  const newItems = [...tabs.value];
+  const index = tabs.value.findIndex((e) => e.key === item.key);
+  if (index > -1) {
+    newItems[index] = item;
+  } else {
+    newItems.push(item);
+  }
+  if (tabs.value.find((e) => e.key === item.key)) {
+  }
+  tabs.value = [...newItems];
 };
 
 const topMenuOptions = computed<MenuOption[]>(() => {

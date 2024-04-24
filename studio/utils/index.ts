@@ -1,5 +1,5 @@
 import { NIcon } from "naive-ui";
-import { NuxtIcon } from "#components";
+import { NuxtIcon, SvgIcon } from "#components";
 import { v4 as uuidv4 } from "uuid";
 
 export const arraify = <T>(target: T | T[]): T[] => {
@@ -35,4 +35,8 @@ export const genProjectName = () => {
 
 export const renderIcon = (name: string) => {
   return () => h(NIcon, null, { default: () => h(NuxtIcon, { name }) });
+};
+
+export const renderSvgIcon = (name: string) => {
+  return () => h(SvgIcon, { name });
 };

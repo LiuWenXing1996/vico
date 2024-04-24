@@ -8,11 +8,12 @@ export default defineNuxtConfig({
     "nuxt-auth-utils",
     "nuxt-icons",
     "nuxt-radash",
+    "@vueuse/nuxt",
   ],
   pages: true,
   routeRules: {
+    "/": { redirect: "/studio" },
     "/studio/**": { ssr: false },
-    "/login": { ssr: false },
   },
   devtools: { enabled: true },
   vite: {

@@ -21,14 +21,16 @@
       </n-descriptions>
       <template #action v-if="actions?.length && actions?.length > 0">
         <n-space>
-          <n-button :focusable="false" v-for="item in actions" size="tiny" @click="item.onClick">
-            <template #icon v-if="item.icon">
-              <svg-icon :name="item.icon" />
+          <n-tooltip trigger="hover" v-for="item in actions">
+            <template #trigger>
+              <n-button :focusable="false" size="tiny" @click="item.onClick">
+                <template #icon v-if="item.icon">
+                  <svg-icon :name="item.icon" />
+                </template>
+              </n-button>
             </template>
-            <template v-if="item.text">
-              {{ item.text }}
-            </template>
-          </n-button>
+            {{ item.title }}
+          </n-tooltip>
         </n-space>
       </template>
     </n-thing>
@@ -39,8 +41,8 @@ defineProps<{
   name?: string;
   descriptions?: Record<string, string | null | undefined>;
   actions?: {
-    text?: string;
-    icon?: string;
+    title: string;
+    icon: string;
     onClick: () => void;
   }[];
 }>();

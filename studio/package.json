@@ -24,6 +24,8 @@
     "@vico/core": "workspace:^",
     "@vicons/antd": "^0.12.0",
     "@vicons/ionicons5": "^0.12.0",
+    "@vueuse/core": "^10.9.0",
+    "@vueuse/nuxt": "^10.9.0",
     "cross-fetch": "^4.0.0",
     "crypto-js": "^4.2.0",
     "defu": "^6.1.4",

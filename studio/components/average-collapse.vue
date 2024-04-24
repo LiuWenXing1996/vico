@@ -18,8 +18,6 @@ const add = (item: AverageCollapseItem) => {
   } else {
     newItems.push(item);
   }
-  if (items.value.find((e) => e.key === item.key)) {
-  }
   items.value = [...newItems];
 };
 const remove = (name: string) => {
