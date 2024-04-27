@@ -18,8 +18,20 @@ import {
   SideTabPosition,
   sideTabToMenuOption,
 } from "~/composables/useSideTabsProvide";
+const props = defineProps<{
+  selectedKey?: string;
+}>();
 const tabs = ref<SideTab[]>([]);
-const selectedKey = ref<string>();
+const emits = defineEmits<{
+  (e: "update:selectedKey", key: string | undefined): void;
+}>();
+const { state: selectedKey, set: setSelectedKey } = useControlledState({
+  key: "selectedKey",
+  props,
+  emit: (value) => {
+    emits("update:selectedKey", value);
+  },
+});
 const addTab = (item: SideTab) => {
   const newItems = [...tabs.value];
   const index = tabs.value.findIndex((e) => e.key === item.key);
@@ -49,19 +61,16 @@ const commonMenuProps = computed<MenuProps>(() => {
     collapsedWidth: 64,
     collapsedIconSize: 22,
     value: selectedKey.value,
-    onUpdateValue: (key: string) => (selectedKey.value = key),
+    onUpdateValue: (key: string) => setSelectedKey(key),
   };
 });
-const { loggedIn, logout } = useAuth();
-const dialog = useDialog();
-const themeVars = useThemeVars();
 createSideTabsProvide({
   currentTabKey: computed(() => selectedKey.value),
   addTab,
 });
 watch(tabs, () => {
   if (!selectedKey.value) {
-    selectedKey.value = tabs.value[0].key;
+    setSelectedKey(tabs.value[0].key);
   }
 });
 </script>

@@ -18,8 +18,8 @@ const handler = defineEventHandler(async (event) => {
     return;
   }
 
-  const prisma = usePrismaClient();
-  const res = await prisma.application.update({
+  const prismaClient = usePrismaClient();
+  const res = await prismaClient.app.update({
     where: {
       id: data.id,
       users: {

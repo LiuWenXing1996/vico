@@ -1,4 +1,4 @@
-import { createVfs, type IVirtulFileSystem } from "@vico/core";
+import { createVfs, type IVirtualFileSystem } from "@vico/core";
 import type { VNodeChild } from "vue";
 import type { IBranch } from "~/server/models/branch";
 import type { IProject } from "~/server/models/project";
@@ -15,7 +15,7 @@ export interface IWorkspaceStatePanelConfig {
 }
 
 export interface IWorkspaceState {
-  vfs: IVirtulFileSystem;
+  vfs: IVirtualFileSystem;
   projectName?: string;
   projectInfo?: IProject;
   branchName?: string;

@@ -6,23 +6,23 @@
           <svg-icon name="user" />
         </template>
       </n-button>
-      <img
-        class="w-[34px] h-[34px] rounded-full border border-slate-200 cursor-pointer"
+      <div
+        class="flex items-center justify-center text-[20px] w-[34px] h-[34px] rounded-full border border-slate-200 cursor-pointer"
         v-else="!loggedIn"
-        :src="currentUser.avatarUrl"
-      />
+      >
+        {{ currentUser?.name[0] }}
+      </div>
     </n-dropdown>
     <DefineTemplate>
       <div class="px-[12px] py-[10px]" v-if="currentUser">
-        {{ currentUser.name }}
+        {{ `${currentUser.name}(${currentUser.email})` }}
       </div>
     </DefineTemplate>
   </div>
 </template>
 <script setup lang="ts">
-// TODO:qingzao
+import { UserLogin } from "#components";
 // 轻造
-// TODO:
 const { loggedIn, currentUser, logout } = useCurrentUser();
 const [DefineTemplate, ReuseTemplate] = createReusableTemplate();
 const dialog = useDialog();
@@ -51,11 +51,19 @@ const handleSelect = (key: string | number) => {
     showLogoutDialog();
   }
   if (key === "login") {
-    loginWithGithub();
+    showLoginDialog();
   }
 };
-const loginWithGithub = async () => {
-  await navigateTo("/api/auth/github", { external: true });
+const showLoginDialog = () => {
+  dialog.create({
+    showIcon: false,
+    style: {
+      width: "510px",
+    },
+    content: () => {
+      return h(UserLogin);
+    },
+  });
 };
 const showLogoutDialog = () => {
   dialog.warning({

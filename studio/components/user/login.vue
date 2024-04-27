@@ -76,17 +76,6 @@
 </template>
 <script setup lang="ts">
 import {
-  NCard,
-  NSpace,
-  NSwitch,
-  NIcon,
-  NH1,
-  NText,
-  NForm,
-  NFormItem,
-  NInput,
-  NInputGroup,
-  NButton,
   type FormRules,
   type FormInst,
   type FormValidationError,
@@ -161,7 +150,7 @@ const handleLogin = async () => {
     (Array.isArray(route.query.callbackUrl)
       ? route.query.callbackUrl[0]
       : route.query.callbackUrl) || "/";
-  navigateTo(redirectUrl, { external: true });
+  await navigateTo(redirectUrl, { external: true });
 };
 definePageMeta({ auth: false });
 </script>

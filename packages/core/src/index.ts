@@ -7,7 +7,7 @@ export {
   type IFsPromisesApi,
   type IFsUtils,
   createVfs,
-  type IVirtulFileSystem
+  type IVirtualFileSystem
 } from './utils/fs'
 
 export {

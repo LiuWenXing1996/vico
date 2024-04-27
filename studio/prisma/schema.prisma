@@ -13,9 +13,58 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  gitToken  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                        String              @id @default(uuid())
+  name                      String              @unique
+  email                     String              @unique
+  password                  String
+  devApps                   App[]               @relation("UsersDevApps")
+  ownApps                   App[]               @relation("UsersOwnApps")
+  createdAt                 DateTime            @default(now())
+  updatedAt                 DateTime            @updatedAt
+  createdAppVersion         AppVersion[]
+  createdAppVersionHistorys AppVersionHistory[]
+}
+
+model App {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  description String?
+  versions    AppVersion[]
+  developers  User[]       @relation("UsersDevApps")
+  owners      User[]       @relation("UsersOwnApps")
+  isDel       Boolean      @default(false)
+  isPublic    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model AppVersion {
+  id                 String              @id @default(uuid())
+  name               String
+  description        String?
+  appVersionHistorys AppVersionHistory[]
+  appId              String
+  app                App                 @relation(fields: [appId], references: [id])
+  createUserId       String
+  createUser         User                @relation(fields: [createUserId], references: [id])
+  createdAt          DateTime            @default(now())
+  isDel              Boolean             @default(false)
+  isPublish          Boolean             @default(false)
+  updatedAt          DateTime            @updatedAt
+
+  @@index([appId, name])
+}
+
+model AppVersionHistory {
+  id           String     @id @default(uuid())
+  name         String
+  description  String?
+  content      Bytes
+  appVersionId String
+  appVersion   AppVersion @relation(fields: [appVersionId], references: [id])
+  createUserId String
+  createUser   User       @relation(fields: [createUserId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@index([appVersionId, name])
 }

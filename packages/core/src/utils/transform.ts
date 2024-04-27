@@ -1,10 +1,10 @@
 import { exportSchemaToCode } from "../schemas/export";
 import { viewSchemaParser, viewSchemaToCode } from "../schemas/view";
 import { getViewSchemaFilePathListFromFs } from "./cookConfig";
-import { createVfs, type IVirtulFileSystem } from "./fs";
+import { createVfs, type IVirtualFileSystem } from "./fs";
 import path from "./path";
 
-export const transform = async (params: { vfs: IVirtulFileSystem }) => {
+export const transform = async (params: { vfs: IVirtualFileSystem }) => {
   const { vfs: orginVfs } = params;
   const vfs = createVfs();
   await vfs.copyFromFs("/", orginVfs);

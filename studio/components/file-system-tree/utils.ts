@@ -1,4 +1,4 @@
-import type { IVirtulFileSystem } from '@vico/core'
+import type { IVirtualFileSystem } from '@vico/core'
 
 export interface IItem<T = any> {
   id: string
@@ -41,7 +41,7 @@ export const getAllPaths = (filePath: string) => {
   return allPaths
 }
 
-export const isDir = (vfs: IVirtulFileSystem, path: string) => {
+export const isDir = (vfs: IVirtualFileSystem, path: string) => {
   const fs = vfs.getFs()
   if (!fs.existsSync(path)) {
     return false

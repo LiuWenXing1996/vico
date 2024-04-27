@@ -2,11 +2,11 @@
 import MonacoEditor from "@/components/monaco-editor/index.vue";
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { getExtName, getLanguage } from './utils';
-import type { IVirtulFileSystem } from "@vue-cook/core";
+import type { IVirtualFileSystem } from "@vue-cook/core";
 
 const props = defineProps<{
     fileName: string,
-    vfs: IVirtulFileSystem
+    vfs: IVirtualFileSystem
 }>()
 const { fileName, vfs } = toRefs(props)
 const content = ref<string>("")

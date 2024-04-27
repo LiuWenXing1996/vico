@@ -1,4 +1,4 @@
-import { createVfs, type IVirtulFileSystem } from "@vico/core";
+import { createVfs, type IVirtualFileSystem } from "@vico/core";
 import { useMessage } from "naive-ui";
 import type { VNodeChild } from "vue";
 import type { IBranch } from "~/server/models/branch";
@@ -7,7 +7,7 @@ import type { IProject } from "~/server/models/project";
 export const WorkspaceStateInjectKey = "workspaceState";
 
 export interface IWorkspaceState {
-  vfs: IVirtulFileSystem;
+  vfs: IVirtualFileSystem;
   project: IProject;
   branch: IBranch;
   currentPanelId?: string;

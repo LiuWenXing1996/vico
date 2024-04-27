@@ -7,7 +7,6 @@ import type { H3Event } from "h3";
 import { GitServerClient } from "./git-server-client";
 import { GitServerRepo, GitServerBranch } from "~/utils/git-server";
 import type { Endpoints } from "@octokit/types";
-import { useUserGitToken } from "~/server/utils/user";
 
 export type GithubUser = Pick<
   Endpoints["GET /user"]["response"]["data"],

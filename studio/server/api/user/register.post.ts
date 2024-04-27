@@ -2,18 +2,17 @@ import { z } from "zod";
 import { getDbCryptoHelper } from "~/server/utils";
 import { useUserSession, UserRole } from "~/server/utils/user";
 
-const paramsScheam = z.object({
+const paramsSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(8),
 });
 
-export type Params = z.infer<typeof paramsScheam>;
-export type Return = Awaited<ReturnType<typeof handler>>;
-const handler = defineEventHandler(async (event) => {
+export type Params = z.infer<typeof paramsSchema>;
+export default defineEventHandler(async (event) => {
   const dbCryptoHelper = getDbCryptoHelper();
   const data = await readValidatedBody(event, (data) => {
-    return paramsScheam.parse(data);
+    return paramsSchema.parse(data);
   });
   const prismaClient = usePrismaClient();
   const userNameFound = await prismaClient.user.findUnique({
@@ -38,13 +37,10 @@ const handler = defineEventHandler(async (event) => {
       statusMessage: "用户邮箱已存在",
     });
   }
-  const isFirstUser = !Boolean(await prismaClient.user.findFirst());
-  const role = isFirstUser ? UserRole.admin : UserRole.user;
   const user = await prismaClient.user.create({
     data: {
       name: data.name,
       email: data.email,
-      role,
       password: dbCryptoHelper.encrypt(data.password),
     },
   });
@@ -53,9 +49,5 @@ const handler = defineEventHandler(async (event) => {
   await useSession.update({
     id: user.id,
   });
-  return {
-    id: user.id,
-    name: user.name,
-  };
+  return true;
 });
-export default handler;

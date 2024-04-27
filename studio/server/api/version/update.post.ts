@@ -2,10 +2,9 @@ import { z } from "zod";
 
 const paramsScheam = z.object({
   id: z.coerce.number().min(1),
+  users: z.array(z.coerce.number().min(1)).min(1),
   name: z.string().min(1),
   description: z.string().optional(),
-  origin: z.string().url(),
-  oAuthClientId: z.string().min(1),
 });
 
 export type Params = z.infer<typeof paramsScheam>;
@@ -14,14 +13,29 @@ const handler = defineEventHandler(async (event) => {
   const data = await readValidatedBody(event, (data) => {
     return paramsScheam.parse(data);
   });
+  const user = await getCurrentUser(event);
+  if (!user) {
+    return;
+  }
+
   const prismaClient = usePrismaClient();
-  const res = await prismaClient.gitServer.update({
-    where: { id: data.id },
+  const res = await prismaClient.application.update({
+    where: {
+      id: data.id,
+      users: {
+        some: {
+          id: user.id,
+        },
+      },
+    },
     data: {
       name: data.name,
       description: data.description,
-      origin: data.origin,
-      oAuthClientId: data.oAuthClientId,
+      users: {
+        connect: data.users.map((e) => {
+          return { id: e };
+        }),
+      },
     },
   });
   return res;

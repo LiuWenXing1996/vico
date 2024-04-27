@@ -4,6 +4,9 @@ import md5 from "md5";
 import type { H3Event } from "h3";
 import { defu } from "defu";
 import CryptoJS from "crypto-js";
+import { createFsUtils } from "@vico/core";
+import fsPromises from "node:fs/promises";
+import path from "node:path";
 
 let prismaClient: PrismaClient | null = null;
 
@@ -81,4 +84,20 @@ export const getDbCryptoHelper = () => {
       return CryptoJS.AES.encrypt(value, password).toString();
     },
   };
+};
+
+export const getAppTpl = async () => {
+  const fsUtils = createFsUtils(fsPromises);
+  const appTplDataDir = path.join(process.cwd(), "./server/data/app-tpl");
+  const appTplFiles = await fsUtils.listFiles(appTplDataDir);
+  const appTpl = await Promise.all(
+    appTplFiles.map(async (filePath) => {
+      const content = await fsUtils.readFile(filePath, "utf-8");
+      return {
+        path: path.relative(appTplDataDir, filePath),
+        content,
+      };
+    })
+  );
+  return appTpl;
 };

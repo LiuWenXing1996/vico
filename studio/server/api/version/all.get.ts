@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { getCurrentUser } from "~/server/utils/user";
+import { checkUserAppPermission, getCurrentUser } from "~/server/utils/user";
 
 export const paramsSchema = z.object({
   key: z.string().optional(),
+  appName: z.string().min(1),
 });
 export type Params = z.infer<typeof paramsSchema>;
 export type Return = Awaited<ReturnType<typeof handler>>;
@@ -12,28 +13,26 @@ const handler = defineEventHandler(async (event) => {
     return paramsSchema.parse(data);
   });
   const user = await getCurrentUser(event);
-  const userId = user?.id;
-  if (!userId) {
+  const prismaClient = usePrismaClient();
+  const app = await prismaClient.app.findUnique({
+    where: {
+      name: data.appName,
+      isDel: false,
+    },
+  });
+  if (!app) {
     return [];
   }
-  const prismaClient = usePrismaClient();
-  const res = await prismaClient.app.findMany({
+  const userAppPermission = await checkUserAppPermission(user, app);
+  if (!userAppPermission.canRead) {
+    return [];
+  }
+  const res = await prismaClient.appVersion.findMany({
     where: {
       name: {
         contains: data.key,
       },
-      OR: [
-        {
-          developers: {
-            some: { id: userId },
-          },
-        },
-        {
-          owners: {
-            some: { id: userId },
-          },
-        },
-      ],
+      appId: app.id,
     },
     orderBy: [
       {

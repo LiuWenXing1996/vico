@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { GitServerType } from "~/utils/git-server";
-import { requireCurrentAdminUser } from "~/server/utils/user";
 import { getDbCryptoHelper } from "~/server/utils";
 
 const paramsScheam = z.object({
@@ -16,12 +15,11 @@ export type Params = z.infer<typeof paramsScheam>;
 export type Return = Awaited<ReturnType<typeof handler>>;
 const handler = defineEventHandler(async (event) => {
   const dbCryptoHelper = getDbCryptoHelper();
-  await requireCurrentAdminUser(event);
   const data = await readValidatedBody(event, (data) => {
     return paramsScheam.parse(data);
   });
-  const prisma = usePrismaClient();
-  const res = await prisma.gitServer.create({
+  const prismaClient = usePrismaClient();
+  const res = await prismaClient.gitServer.create({
     data: {
       name: data.name,
       description: data.description,

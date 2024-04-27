@@ -5,58 +5,102 @@
     </template>
     <template #label> 文件管理器 </template>
     <template #title> 文件管理器 </template>
+    <template #titleActions>
+      <n-space :size="1">
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <n-button
+              :focusable="false"
+              size="tiny"
+              quaternary
+              @click="filesRequest.refresh"
+            >
+              <template #icon>
+                <svg-icon name="refresh" :size="12" />
+              </template>
+            </n-button>
+          </template>
+          刷新
+        </n-tooltip>
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <n-button
+              :focusable="false"
+              size="tiny"
+              quaternary
+              @click="() => {}"
+            >
+              <template #icon>
+                <svg-icon name="add" :size="12" />
+              </template>
+            </n-button>
+          </template>
+          添加
+        </n-tooltip>
+      </n-space>
+    </template>
     <div class="h-full">
-      <file-system-tree :vfs="currentVfs" />
+      <file-system-tree
+        :vfs="studioState.vfs"
+        :selected-keys="selectedKeys"
+        @update:selectedKeys="
+          (keys) => {
+            console.log({ keys });
+            selectedKeys = keys;
+            tryOpenFileEditPanel(keys[0]);
+          }
+        "
+      />
     </div>
   </side-tab-pane>
 </template>
 <script setup lang="ts">
-import { createVfs, type IVirtulFileSystem } from "@vico/core";
-import JSZip from "jszip";
-import type { Params } from "~/server/api/repo/files.get";
-
-const props = defineProps<{
-  repoId?: string;
-  branchId?: string;
-}>();
-const currentVfs = shallowRef<IVirtulFileSystem>();
-const { repoId, branchId } = toRefs(props);
-const filesRequest = useCustomRequest(async () => {
-  if (!repoId.value) {
-    return;
-  }
-  if (!branchId.value) {
-    return;
-  }
-  const params: Params = {
-    repoId: repoId.value,
-    branchId: branchId.value,
-  };
-  const res = await $fetch("/api/repo/files", {
-    params,
-    responseType: "arrayBuffer",
-  });
-  const zip = new JSZip();
-  const zipData = await zip.loadAsync(res as any);
-  const vfs = createVfs();
-  await Promise.all(
-    Object.keys(zipData.files).map(async (filePath) => {
-      const zipFile = zipData.files[filePath];
-      if (!zipFile.dir) {
-        const content = await zipFile.async("base64");
-        await vfs.outputFile(filePath, content);
-      }
-    })
-  );
-  currentVfs.value = vfs;
-  return res;
-});
-
+import { FileEditor } from "#components";
+import type { Params } from "~/server/api/app/files.get";
+const { studioState, openPanel } = useStudioState();
+const selectedKeys = ref<string[]>([]);
 watch(
-  [repoId, branchId],
-  () => {
-    filesRequest.refreshAsync();
+  () => studioState.value.currentPanelKey,
+  (v) => {
+    selectedKeys.value = v ? [v] : [];
   },
   { immediate: true }
 );
+const tryOpenFileEditPanel = async (filePath: string) => {
+  const isDir = await studioState.value.vfs.isDirectory(filePath);
+  if (isDir) {
+    return;
+  }
+  const key = `file-edit-${filePath}`;
+  openPanel({
+    key,
+    title: filePath,
+    content: () =>
+      h(FileEditor, { fileName: filePath, vfs: studioState.value.vfs }),
+  });
+};
+const filesRequest = useCustomRequest(async () => {
+  const appName = studioState.value.currentApp?.name;
+  const versionName = studioState.value.currentVersion?.name;
+  if (!appName) {
+    return;
+  }
+  if (!versionName) {
+    return;
+  }
+  const params: Params = {
+    appName,
+    versionName,
+  };
+  // @ts-ignore
+  const res = await $fetch("/api/app/files", {
+    params,
+  });
+  await Promise.all(
+    res.map(async (e) => {
+      await studioState.value.vfs.outputFile(e.path, e.content);
+    })
+  );
+  return res;
+});
 </script>

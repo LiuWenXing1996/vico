@@ -1,21 +1,16 @@
 import { z } from "zod";
-import { ProjectModel } from "~/server/models/project";
-import { cryptoPassword, getJwtTokenSecret } from "~/server/utils";
-import jwt from "jsonwebtoken";
-import { jwtSign } from "~/server/utils/jwt";
 import { useUserSession } from "~/server/utils/user";
 
-const paramsScheam = z.object({
+const paramsSchema = z.object({
   name: z.string().min(1),
   password: z.string().min(1),
 });
 
-export type Params = z.infer<typeof paramsScheam>;
-
+export type Params = z.infer<typeof paramsSchema>;
 export default defineEventHandler(async (event) => {
   const dbCryptoHelper = getDbCryptoHelper();
   const data = await readValidatedBody(event, (data) => {
-    return paramsScheam.parse(data);
+    return paramsSchema.parse(data);
   });
   const prismaClient = usePrismaClient();
   const user = await prismaClient.user.findUnique({
@@ -42,8 +37,5 @@ export default defineEventHandler(async (event) => {
     id: user.id,
   });
 
-  return {
-    id: user.id,
-    name: user.name,
-  };
+  return true;
 });

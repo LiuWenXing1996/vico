@@ -10,31 +10,37 @@
           </div>
           <div class="ml-[10px]">
             <n-space :align="'center'">
-              <n-select
-                size="small"
-                class="min-w-[80px]"
-                :consistent-menu-width="false"
-                v-model:value="appName"
-                @update:value="
-                  (v,option:any) => {
-                    goToRepoEdit(option._richValue);
-                  }
-                "
-                :options="repoListOptions"
-              />
-              <div>/</div>
-              <n-select
-                size="small"
-                class="min-w-[100px]"
-                :consistent-menu-width="false"
-                v-model:value="versionName"
-                @update:value="
-                  (v,option:any) => {
-                    goToBranchEdit(option._richValue);
-                  }
-                "
-                :options="branchListOptions"
-              />
+              <template v-if="appName">
+                <div>{{ appName }}</div>
+                <div>/</div>
+                <template v-if="versionName">
+                  <div>{{ versionName }}</div>
+                </template>
+                <template v-else>
+                  <n-button
+                    :focusable="false"
+                    size="small"
+                    @click="
+                      () => {
+                        setSideSelectedKey('versions');
+                      }
+                    "
+                    >选择版本</n-button
+                  >
+                </template>
+              </template>
+              <template v-else>
+                <n-button
+                  :focusable="false"
+                  size="small"
+                  @click="
+                    () => {
+                      setSideSelectedKey('apps');
+                    }
+                  "
+                  >选择应用</n-button
+                >
+              </template>
             </n-space>
           </div>
         </div>
@@ -46,8 +52,15 @@
       <div class="h-[calc(100%-50px)]">
         <Splitpanes>
           <Pane class="left-pane" min-size="15" size="20">
-            <side-tabs>
-              <side-tab-pane-files :repo-id="appName" :branch-id="versionName" />
+            <side-tabs
+              :selected-key="studioState.sideSelectedKey"
+              @update:selectedKey="
+                (key) => {
+                  setSideSelectedKey(key || '');
+                }
+              "
+            >
+              <side-tab-pane-files />
               <side-tab-pane
                 name="search"
                 label="搜索"
@@ -66,7 +79,52 @@
           <Pane class="center-bottom-pane" min-size="15" size="60">
             <Splitpanes horizontal>
               <Pane class="center-pane" min-size="15">
-                <WorkspaceCenterPane></WorkspaceCenterPane>
+                <div class="flex flex-col h-full">
+                  <template v-if="studioState.panelList.length <= 0">
+                    <div class="content">
+                      <n-empty description="没有打开的面板"></n-empty>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <n-tabs
+                      size="small"
+                      type="card"
+                      :value="studioState.currentPanelKey"
+                      @update:value="
+                        (v) => {
+                          setCurrentPanelKey(v);
+                        }
+                      "
+                      closable
+                      @close="
+                        (key) => {
+                          closePanel(key);
+                        }
+                      "
+                      :style="{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: ' column',
+                      }"
+                      :pane-style="{
+                        flexGrow: 1,
+                        padding: 0,
+                        overflow: 'hidden',
+                      }"
+                    >
+                      <n-tab-pane
+                        :name="l.key"
+                        v-for="l in studioState.panelList"
+                        display-directive="show"
+                      >
+                        <template #tab>
+                          <div>{{ l.title }}</div>
+                        </template>
+                        <component :is="l.content()"></component>
+                      </n-tab-pane>
+                    </n-tabs>
+                  </template>
+                </div>
               </Pane>
             </Splitpanes>
           </Pane>
@@ -77,11 +135,16 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectOption } from "naive-ui";
 import { first } from "radash";
-import type { Params as RepoListParams } from "~/server/api/repo/list.get";
-import type { Params as BranchListParams } from "~/server/api/branch/list.get";
 import { Splitpanes, Pane } from "splitpanes";
+const {
+  studioState,
+  setCurrentApp,
+  setCurrentVersion,
+  setSideSelectedKey,
+  closePanel,
+  setCurrentPanelKey,
+} = useStudioState();
 const route = useRoute();
 const appName = computed(
   () => first(arraify(route.params.appName)) || undefined
@@ -89,62 +152,29 @@ const appName = computed(
 const versionName = computed(
   () => first(arraify(route.params.versionName)) || undefined
 );
-const repoListRequest = useCustomRequest(async () => {
-  const params: RepoListParams = {
-    page: 1,
-    limit: 10,
-  };
-  return await $fetch("/api/repo/list", {
-    params: params,
-  });
-});
-const repoListOptions = computed<SelectOption[]>(() => {
-  if (!repoListRequest.data.value?.items) {
-    return [];
+const initApp = async () => {
+  try {
+    const app = await $fetch("/api/app/detail", {
+      params: { name: appName.value },
+    });
+    setCurrentApp(app);
+  } catch (error) {
+    console.log({ error });
   }
-  return repoListRequest.data.value.items.map((e) => {
-    return {
-      label: e.name,
-      value: e.id,
-      _richValue: e,
-    };
-  });
-});
-const branchListRequest = useCustomRequest(async () => {
-  if (!appName.value) {
-    return;
-  }
-  const params: BranchListParams = {
-    page: 1,
-    limit: 10,
-    repoId: appName.value,
-  };
-  return await $fetch("/api/branch/list", {
-    params: params,
-  });
-});
-const branchListOptions = computed<SelectOption[]>(() => {
-  if (!branchListRequest.data.value?.items) {
-    return [];
-  }
-  return branchListRequest.data.value.items.map((e) => {
-    return {
-      label: e.name,
-      value: e.id,
-      _richValue: e,
-    };
-  });
-});
-const goToRepoEdit = async (repo: GitServerRepo) => {
-  const url = `/studio/${repo.id}`;
-  await navigateTo(url);
 };
-const goToBranchEdit = async (branch: GitServerBranch) => {
-  const url = `/studio/${appName.value}/${branch.id}`;
-  await navigateTo(url);
+const initVersion = async () => {
+  try {
+    const version = await $fetch("/api/version/detail", {
+      params: { name: versionName.value, appName: appName.value },
+    });
+    setCurrentVersion(version);
+  } catch (error) {
+    setCurrentVersion();
+  }
 };
-onMounted(() => {
-  repoListRequest.runAsync();
-  branchListRequest.runAsync();
-});
+const init = async () => {
+  await initApp();
+  await initVersion();
+};
+await init();
 </script>

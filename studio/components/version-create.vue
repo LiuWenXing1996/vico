@@ -1,5 +1,5 @@
 <template>
-  <n-spin :delay="1000" :show="appCreateRequest.loading.value">
+  <n-spin :delay="1000" :show="versionCreateRequest.loading.value">
     <n-space vertical>
       <n-form
         ref="formRef"
@@ -13,10 +13,10 @@
         }"
       >
         <n-form-item label="名称" path="name">
-          <n-input v-model:value="formValue.name" placeholder="请输入名称" />
+          <NInput v-model:value="formValue.name" placeholder="请输入名称" />
         </n-form-item>
         <n-form-item label="描述信息" path="description">
-          <n-input v-model:value="formValue.description" type="textarea" />
+          <NInput v-model:value="formValue.description" type="textarea" />
         </n-form-item>
       </n-form>
       <n-row :gutter="[0, 24]">
@@ -25,8 +25,8 @@
             <n-button
               round
               type="primary"
-              @click="appCreateRequest.runAsync"
-              :loading="appCreateRequest.loading.value"
+              @click="versionCreateRequest.runAsync"
+              :loading="versionCreateRequest.loading.value"
             >
               保存
             </n-button>
@@ -58,7 +58,7 @@ const rules: FormRules = {
     },
   ],
 };
-const appCreateRequest = useCustomRequest(async () => {
+const versionCreateRequest = useCustomRequest(async () => {
   const params: Params = {
     name: formValue.value.name || "",
     description: formValue.value.description,

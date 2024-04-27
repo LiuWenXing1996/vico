@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { NTree, NIcon, type TreeOption } from "naive-ui";
 import { Folder } from "@vicons/ionicons5";
-import { type IVirtulFileSystem } from "@vico/core";
+import { type IVirtualFileSystem } from "@vico/core";
 import { listToTree, type IItem, getAllPaths, isDir } from "./utils";
 import type { FSWatcher } from "node:fs";
 import type { VNodeChild } from "vue";
 const props = defineProps<{
-  vfs?: IVirtulFileSystem;
+  vfs?: IVirtualFileSystem;
   selectedKeys?: string[];
 }>();
 
 const emits = defineEmits<{
-  (e: "changeSelectedKeys", keys: string[]): void;
+  (e: "update:selectedKeys", keys: string[]): void;
 }>();
 
 const { vfs } = toRefs(props);
@@ -19,7 +19,7 @@ const { state: selectedKeys, set: setSelectedKeys } = useControlledState({
   key: "selectedKeys",
   props,
   emit: (value) => {
-    emits("changeSelectedKeys", value || []);
+    emits("update:selectedKeys", value || []);
   },
 });
 const currentFsWatcher = ref<FSWatcher>();

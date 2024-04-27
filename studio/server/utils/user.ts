@@ -1,12 +1,8 @@
+import { App, User } from "@prisma/client";
 import type { H3Event } from "h3";
 
 interface UserSessionData {
-  id: number;
-}
-
-export enum UserRole {
-  admin = "admin",
-  user = "user",
+  id: string;
 }
 
 export const useUserSession = async (event: H3Event) => {
@@ -43,8 +39,8 @@ export const getCurrentUser = async (event: H3Event) => {
   if (!userId) {
     return;
   }
-  const prisma = usePrismaClient();
-  const user = await prisma.user.findUnique({
+  const prismaClient = usePrismaClient();
+  const user = await prismaClient.user.findUnique({
     where: {
       id: userId,
     },
@@ -66,31 +62,48 @@ export const requireCurrentUser = async (event: H3Event) => {
   return user;
 };
 
-export const requireCurrentAdminUser = async (event: H3Event) => {
-  const user = await requireCurrentUser(event);
-  if (user.role !== UserRole.admin) {
-    throw createError({
-      statusCode: 401,
-      message: "用户不是管理员",
-    });
+export const checkUserAppPermission = async (
+  user?: User | null,
+  app?: App | null
+) => {
+  if (!app) {
+    return {};
   }
-  return user;
-};
-
-export const useUserGitToken = async (event: H3Event) => {
-  const dbCryptoHelper = getDbCryptoHelper();
-  const { user: { id: userId } = {} } = await getUserSession(event);
-  const prisma = usePrismaClient();
-  const user = await prisma.user.findUnique({
+  if (!user) {
+    if (app.isPublic) {
+      return {
+        canRead: true,
+      };
+    } else {
+      return {};
+    }
+  }
+  const prismaClient = usePrismaClient();
+  const userApps = await prismaClient.user.findUnique({
     where: {
-      id: userId,
+      id: user.id,
+    },
+    select: {
+      devApps: true,
+      ownApps: true,
     },
   });
-  if (!user) {
-    return;
+  if (userApps?.ownApps.find((e) => e.id === app.id)) {
+    return {
+      canRead: true,
+      canEdit: true,
+      canDel: true,
+    };
   }
-  if (!user.gitToken) {
-    return;
+  if (userApps?.devApps.find((e) => e.id === app.id)) {
+    return {
+      canRead: true,
+      canEdit: true,
+    };
   }
-  return dbCryptoHelper.decrypt(user.gitToken);
+  return {};
 };
+
+export const getUserApps = () => {};
+
+export const getUserAppDetail = () => {};

@@ -40,10 +40,10 @@
       </n-space>
     </template>
     <div class="h-full flex flex-col">
-      <div class="flex p-[10px]">
+      <div class="flex m-[14px]">
         <n-input
           clearable
-          :value="searchKey"
+          :value="fetchParams.key"
           @update-value="
             (value) => {
               fetchParams = {
@@ -62,12 +62,13 @@
             content-class="h-full"
           >
             <n-scrollbar
+              trigger="none"
               v-if="
                 appListRequest.data.value &&
                 appListRequest.data.value.length > 0
               "
             >
-              <n-list class="px-[15px] py-[10px]" hoverable>
+              <n-list class="mx-[14px] mb-[14px]" hoverable bordered>
                 <n-list-item v-for="item in appListRequest.data.value">
                   <custom-thing
                     :name="item.name"
@@ -78,17 +79,21 @@
                       {
                         title: '开发',
                         icon: 'develop',
-                        onClick: () => showLogoutDialog(item),
+                        onClick: () => {
+                          goToAppEdit(item);
+                        },
                       },
                       {
                         title: '编辑',
                         icon: 'edit',
-                        onClick: () => showLogoutDialog(item),
+                        onClick: () => {},
                       },
                       {
                         title: '删除',
                         icon: 'delete',
-                        onClick: () => showLogoutDialog(item),
+                        onClick: () => {
+                          showDelDialog(item);
+                        },
                       },
                     ]"
                   />
@@ -108,7 +113,6 @@
 import { AppCreate } from "#components";
 type Item = NonNullable<(typeof appListRequest)["data"]["value"]>[0];
 const dialog = useDialog();
-const searchKey = shallowRef<string>("");
 const fetchParams = ref<{
   sort: string;
   key: string;
@@ -117,6 +121,7 @@ const fetchParams = ref<{
   key: "",
 });
 const appListRequest = useCustomRequest(async () => {
+  // @ts-ignore
   return await $fetch("/api/app/all", {
     params: fetchParams.value,
   });
@@ -153,7 +158,7 @@ const showCreateDialog = () => {
     },
   });
 };
-const showLogoutDialog = (item: Item) => {
+const showDelDialog = (item: Item) => {
   const dialogIns = dialog.warning({
     title: "删除提示",
     content: `确定删除 ${item.name} 吗？`,
@@ -165,5 +170,10 @@ const showLogoutDialog = (item: Item) => {
       await appListRequest.refreshAsync();
     },
   });
+};
+
+const goToAppEdit = async (item: Item) => {
+  const url = `/studio/${item.name}`;
+  await navigateTo(url, { external: true });
 };
 </script>
